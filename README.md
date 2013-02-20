@@ -1,16 +1,16 @@
-# GrowthForecast Client
+# GrowthForecast Client [![Build Status](https://secure.travis-ci.org/sonots/growthforecast-client.png?branch=master)](http://travis-ci.org/sonots/growthforecast-client) [![Dependency Status](https://gemnasium.com/sonots/growthforecast-client.png)](https://gemnasium.com/sonots/growthforecast-client)
 
 testing ruby: 1.9.3; GrowthForecast: > 0.39
 
 ## About GrowthForecast Client
 
-growthforecast-client is a ruby client library for GrowthForecast API where GrowthForecast is a visualization graph tool. See [this](http://kazeburo.github.com/GrowthForecast/).
+growthforecast-client is a ruby client library for GrowthForecast API where [GrowthForecast](http://kazeburo.github.com/GrowthForecast/) is a visualization graph tool.
 
 ## USAGE
 
     gem install growthforecast-client
 
-See examples directory.
+See [examples](examples) directory.
 
 ## Contributing
 
