@@ -65,21 +65,45 @@ module GrowthForecast
       get_json('/json/list/graph')
     end
 
-    # Get the list of complex graphs, /json/list/complex
-    # @return [Hash] list of complex graphs
+    # A Helper: Get the list of section
+    # @return [Hash] list of sections
+    # @example
+    # {
+    #   "service_name1" => [
+    #     "section_name1",
+    #     "section_name2",
+    #   ],
+    #   "service_name2" => [
+    #     "section_name1",
+    #     "section_name2",
+    #   ],
+    # }
+    def list_section
+      graphs = list_graph
+      services = {}
+      graphs.each do |graph|
+        service_name, section_name = graph['service_name'], graph['section_name']
+        services[service_name] ||= {}
+        services[service_name][section_name] ||= true
+      end
+      Hash[services.map {|service_name, sections| [service_name, sections.keys] }]
+    end
+
+    # A Helper: Get the list of services
+    # @return [Array] list of services
     # @example
     # [
-    #   {"service_name"=>"test",
-    #    "graph_name"=>"<2sec_count",
-    #    "section_name"=>"hostname",
-    #    "id"=>4},
-    #   {"service_name"=>"test",
-    #    "graph_name"=>"<1sec_count",
-    #    "section_name"=>"hostname",
-    #    "id"=>3},
+    #   "service_name1",
+    #   "service_name2",
     # ]
-    def list_complex
-      get_json('/json/list/complex')
+    def list_service
+      graphs = list_graph
+      services = {}
+      graphs.each do |graph|
+        service_name = graph['service_name']
+        services[service_name] ||= true
+      end
+      services.keys
     end
 
     # Get the propety of a graph, GET /api/:service_name/:section_name/:graph_name
@@ -178,6 +202,23 @@ module GrowthForecast
       id = data['id']
       updates = handle_update_params(data, params)
       post_json("/json/edit/graph/#{id}", updates)
+    end
+
+    # Get the list of complex graphs, /json/list/complex
+    # @return [Hash] list of complex graphs
+    # @example
+    # [
+    #   {"service_name"=>"test",
+    #    "graph_name"=>"<2sec_count",
+    #    "section_name"=>"hostname",
+    #    "id"=>4},
+    #   {"service_name"=>"test",
+    #    "graph_name"=>"<1sec_count",
+    #    "section_name"=>"hostname",
+    #    "id"=>3},
+    # ]
+    def list_complex
+      get_json('/json/list/complex')
     end
 
     # Create a complex graph

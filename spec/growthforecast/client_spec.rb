@@ -6,7 +6,11 @@ describe GrowthForecast::Client do
                   sulimit unit sort updated_at adjust type sllimit meta md5]
 
   before(:all) { @client = GrowthForecast::Client.new('http://localhost:5125') }
+
   include_context "stub_list_graph" if ENV['MOCK'] == 'on'
+  let(:graphs) { @client.list_graph }
+  let(:graph) { graphs.first }
+
   include_context "stub_post_graph" if ENV['MOCK'] == 'on'
   include_context "stub_delete_graph" if ENV['MOCK'] == 'on'
   before(:all) {
@@ -19,15 +23,27 @@ describe GrowthForecast::Client do
     @client.delete_graph("app_name", "hostname", "<1sec_count") rescue nil
     @client.delete_graph("app_name", "hostname", "<2sec_count") rescue nil
   }
-  include_context "stub_list_graph" if ENV['MOCK'] == 'on'
-  let(:graphs) { @client.list_graph }
-  let(:graph) { graphs.first }
 
   context "#list_graph" do
     include_context "stub_list_graph" if ENV['MOCK'] == 'on'
     subject { graphs }
     its(:size) { should > 0 }
     id_keys.each {|key| its(:first) { should have_key(key) } }
+  end
+
+  context "#list_section" do
+    include_context "stub_list_graph" if ENV['MOCK'] == 'on'
+    subject { @client.list_section }
+    its(:size) { should > 0 }
+    its(:class) { should == Hash }
+    it { subject.each {|service_name, sections| sections.size.should > 0 } }
+  end
+
+  context "#list_service" do
+    include_context "stub_list_graph" if ENV['MOCK'] == 'on'
+    subject { @client.list_service }
+    its(:size) { should > 0 }
+    its(:class) { should == Array }
   end
 
   context "#get_graph" do
