@@ -8,11 +8,11 @@ module GrowthForecast
   class Error < StandardError; end
   class NotFound < Error; end
   class AlreadyExists < Error; end
-  attr_accessor :debug
 
   class Client
+    attr_accessor :debug
     # @param [String] base_uri The base uri of GrowthForecast
-    def initialize(base_uri)
+    def initialize(base_uri = 'http://127.0.0.1:5125')
       @base_uri = base_uri
     end
 
@@ -29,7 +29,7 @@ module GrowthForecast
     # @param [String] path
     # @param [Hash] data 
     # @return [Hash] response body
-    def post_json(path, data)
+    def post_json(path, data = {})
       pp data if @debug
       json = JSON.generate(data)
       res = client.post("#{@base_uri}#{path}", json)
@@ -41,11 +41,11 @@ module GrowthForecast
     # @param [String] path
     # @param [Hash] data 
     # @return [String] response body
-    def post_query(path, data)
+    def post_query(path, data = {})
       pp data if @debug
       res = client.post("#{@base_uri}#{path}", data)
       handle_error(res)
-      res.body
+      JSON.parse(res.body)
     end
 
     # Get the list of graphs, /json/list/graph
@@ -53,19 +53,36 @@ module GrowthForecast
     # @example
     # [
     #   {"service_name"=>"test",
-    #    "graph_name"=>"response_count_lt_2",
-    #    "section_name"=>"gowdev5004",
+    #    "graph_name"=>"<2sec_count",
+    #    "section_name"=>"hostname",
     #    "id"=>4},
     #   {"service_name"=>"test",
-    #    "graph_name"=>"response_count_lt_1",
-    #    "section_name"=>"gowdev5004",
+    #    "graph_name"=>"<1sec_count",
+    #    "section_name"=>"hostname",
     #    "id"=>3},
     # ]
     def list_graph
       get_json('/json/list/graph')
     end
 
-    # Get the propety of a graph, /api/:service_name/:section_name/:graph_name
+    # Get the list of complex graphs, /json/list/complex
+    # @return [Hash] list of complex graphs
+    # @example
+    # [
+    #   {"service_name"=>"test",
+    #    "graph_name"=>"<2sec_count",
+    #    "section_name"=>"hostname",
+    #    "id"=>4},
+    #   {"service_name"=>"test",
+    #    "graph_name"=>"<1sec_count",
+    #    "section_name"=>"hostname",
+    #    "id"=>3},
+    # ]
+    def list_complex
+      get_json('/json/list/complex')
+    end
+
+    # Get the propety of a graph, GET /api/:service_name/:section_name/:graph_name
     # @param [String] service_name
     # @param [String] section_name
     # @param [String] graph_name
@@ -82,7 +99,7 @@ module GrowthForecast
     #  "gmode"=>"gauge",
     #  "color"=>"#cc6633",
     #  "created_at"=>"2013/02/02 00:41:11",
-    #  "section_name"=>"gowdev5004",
+    #  "section_name"=>"hostname",
     #  "ulimit"=>1000000000,
     #  "id"=>21,
     #  "graph_name"=>"<4sec_count",
@@ -129,70 +146,99 @@ module GrowthForecast
       get_json("/json/graph/#{id}")
     end
 
+    # Post parameters to a graph, POST /api/:service_name/:section_name/:graph_name
+    # @param [String] service_name
+    # @param [String] section_name
+    # @param [String] graph_name
+    # @param [Hash] params The POST parameters. See #get_graph
+    def post_graph(service_name, section_name, graph_name, params)
+      post_query("/api/#{service_name}/#{section_name}/#{graph_name}", params)
+    end
+
+    # Delete a graph, POST /delete/:service_name/:section_name/:graph_name
+    # @param [String] service_name
+    # @param [String] section_name
+    # @param [String] graph_name
+    def delete_graph(service_name, section_name, graph_name)
+      post_query("/delete/#{service_name}/#{section_name}/#{graph_name}")
+    end
+
     # Update the property of a graph, /json/edit/graph/:id
     # @param [String] service_name
     # @param [String] section_name
     # @param [String] graph_name
-    # @param [Hash]   params See #get_graph for available parameters
+    # @param [Hash]   params
+    #   All of parameters given by #get_graph are available except `number` and `mode`.
     # @return [Hash]  error response
     # @example
     # {"error"=>0} #=> Success
     # {"error"=>1} #=> Error
-    def update_graph(service_name, section_name, graph_name, params)
+    def edit_graph(service_name, section_name, graph_name, params)
       data = get_graph(service_name, section_name, graph_name)
       id = data['id']
       updates = handle_update_params(data, params)
-      pp updates if @debug
-      post_json("/json/edit/graph/#{id}", updates)
-    end
-
-    # Update the property of a graph, /json/edit/graph/:id
-    # @param [String] id
-    # @param [Hash]   params See #get_graph for available parameters
-    # @return [Hash]  error response
-    # @example
-    # {"error"=>0} #=> Success
-    # {"error"=>1} #=> Error
-    def update_graph_by_id(id, params)
-      data = get_graph_by_id(id)
-      updates = handle_update_params(data, params)
-      pp updates if @debug
       post_json("/json/edit/graph/#{id}", updates)
     end
 
     # Create a complex graph
     #
-    # @param [Array] from_graphs Array of graph properties. A graph property is like
-    #   {path: "/:service_name/:section_name/:graph_name", gmode: "gauge", stack: true, type: 'AREA' }
-    # @param [Hash] to_complex Property of Complex Graph, which is like
-    #   {path: "/:service_name/:section_name/:graph_name", description: "description", sort: 10 }
+    # @param [Array] from_graphs Array of graph properties whose keys are
+    #   ["service_name", "section_name", "graph_name", "gmode", "stack", "type"]
+    # @param [Hash] to_complex Property of Complex Graph, whose keys are like
+    #   ["service_name", "section_name", "graph_name", "description", "sort"]
     def create_complex(from_graphs, to_complex)
       graph_data = []
       from_graphs.each do |from_graph|
-        service_name, section_name, graph_name = from_graph[:path].split('/')
-        graph = get_graph(service_name, section_name, graph_name)
+        graph = get_graph(from_graph["service_name"], from_graph["section_name"], from_graph["graph_name"])
         graph_id = graph['id']
 
         graph_data << {
-          :gmode    => from_graph[:gmode],
-          :stack    => from_graph[:stack],
-          :type     => from_graph[:type],
+          :gmode    => from_graph["gmode"],
+          :stack    => from_graph["stack"],
+          :type     => from_graph["type"],
           :graph_id => graph_id
         }
       end
 
-      to_service, to_section, to_graph = to_complex[:path].split('/')
       post_params = {
-        :service_name => to_service,
-        :section_name => to_section,
-        :graph_name   => to_graph,
-        :description  => to_complex[:description],
-        :sort         => to_complex[:sort],
+        :service_name => to_complex["service_name"],
+        :section_name => to_complex["section_name"],
+        :graph_name   => to_complex["graph_name"],
+        :description  => to_complex["description"],
+        :sort         => to_complex["sort"],
         :data         => graph_data
       }
 
-      pp updates if @post_params
       post_json('/json/create/complex', post_params)
+    end
+
+    # Delete a complex graph
+    #
+    # This is a helper method of GrowthForecast API to find complex graph id and call delete_complex_by_id
+    #
+    # @param [String] service_name
+    # @param [String] section_name
+    # @param [String] graph_name
+    # @return [Hash]  error response
+    # @example
+    # {"error"=>0} #=> Success
+    # {"error"=>1} #=> Error
+    def delete_complex(service_name, section_name, graph_name)
+      complex_graphs = list_complex
+      complex = complex_graphs.select {|g| g["service_name"] == service_name and g["section_name"] == section_name and g["graph_name"] == graph_name }
+      raise NotFound if complex.empty?
+      delete_complex_by_id(complex.first["id"])
+    end
+
+    # Delete a complex graph, /delete_complex/:complex_id
+    #
+    # @param [String] id of a complex graph
+    # @return [Hash]  error response
+    # @example
+    # {"error"=>0} #=> Success
+    # {"error"=>1} #=> Error
+    def delete_complex_by_id(complex_id)
+      post_query("/delete_complex/#{complex_id}")
     end
 
     private
@@ -225,9 +271,6 @@ module GrowthForecast
     # @return [Hash] merged parameters
     def handle_update_params(graph_data, params)
       updates = graph_data.merge(params)
-      # Do not post `number` when `mode` is `count` not to increment the number of graph.
-      # But, post as is if the user specify `number` or `mode` in params. Sucks!
-      updates['number'] = 0 if !params.has_key?('number') and updates['mode'] == 'count'
       # `meta` field is automatically added when we call get_graph.
       # If we post `meta` data to update graph, `meta` is constructed circularly. Sucks!
       # Thus, I remove the `meta` here.

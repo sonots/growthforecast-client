@@ -4,7 +4,7 @@ testing ruby: 1.9.3; GrowthForecast: > 0.39
 
 ## About GrowthForecast Client
 
-growthforecast-client is a ruby client library for GrowthForecast *JSON* API where GrowthForecast is a visualization graph tool. See [this](http://kazeburo.github.com/GrowthForecast/).
+growthforecast-client is a ruby client library for GrowthForecast API where GrowthForecast is a visualization graph tool. See [this](http://kazeburo.github.com/GrowthForecast/).
 
 ## USAGE
 
