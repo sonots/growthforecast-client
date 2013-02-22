@@ -62,7 +62,34 @@ shared_context "stub_get_graph" do
 end
 
 shared_context "stub_get_graph_by_id" do
-  include_context "stub_get_graph"
+  # /json/graph/:id does not return `meta` and `md5`
+  let(:graph_example) {
+    {
+      "number"=>0,
+      "llimit"=>-1000000000,
+      "mode"=>"gauge",
+      "stype"=>"AREA",
+      "adjustval"=>"1",
+      # "meta"=>"",
+      "service_name"=>"app_name",
+      "gmode"=>"gauge",
+      "color"=>"#cc6633",
+      "created_at"=>"2013/02/02 00:41:11",
+      "section_name"=>"hostname",
+      "ulimit"=>1000000000,
+      "id"=>1,
+      "graph_name"=>"<1sec_count",
+      "description"=>"",
+      "sulimit"=>100000,
+      "unit"=>"",
+      "sort"=>0,
+      "updated_at"=>"2013/02/02 02:32:10",
+      "adjust"=>"*",
+      "type"=>"AREA",
+      "sllimit"=>-100000,
+      # "md5"=>"3c59dc048e8850243be8079a5c74d079"
+    }
+  }
 
   proc = Proc.new do
     stub_request(:get, "#{base_uri}/json/graph/#{graph['id']}").

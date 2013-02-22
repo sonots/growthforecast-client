@@ -1,10 +1,6 @@
 require 'spec_helper'
 
-describe GrowthForecast::Client do
-  id_keys    = %w[id service_name section_name graph_name]
-  graph_keys = %w[number llimit mode stype adjustval gmode color created_at ulimit description
-                  sulimit unit sort updated_at adjust type sllimit meta md5]
-
+shared_context "setup_growthforecast_client" do
   before(:all) { @client = GrowthForecast::Client.new('http://localhost:5125') }
 
   include_context "stub_list_graph" if ENV['MOCK'] == 'on'
@@ -23,6 +19,13 @@ describe GrowthForecast::Client do
     @client.delete_graph("app_name", "hostname", "<1sec_count") rescue nil
     @client.delete_graph("app_name", "hostname", "<2sec_count") rescue nil
   }
+end
+
+describe GrowthForecast::Client do
+  include_context "setup_growthforecast_client"
+  id_keys    = %w[id service_name section_name graph_name]
+  graph_keys = %w[number llimit mode stype adjustval gmode color created_at ulimit description
+                  sulimit unit sort updated_at adjust type sllimit meta md5]
 
   context "#list_graph" do
     include_context "stub_list_graph" if ENV['MOCK'] == 'on'

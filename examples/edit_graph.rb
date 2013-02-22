@@ -5,8 +5,7 @@
 require 'growthforecast-client'
 
 # Create a GrowthForecast Client, given he base URI of GrowthForecast
-uri = 'http://localhost:5125'
-client = GrowthForecast::Client.new(uri)
+client = GrowthForecast::Client.new('http://localhost:5125')
 
 # configure colors of graphs whose names are as belows:
 graph_colors = {

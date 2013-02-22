@@ -6,6 +6,8 @@ testing ruby: 1.9.3; GrowthForecast: > 0.39
 
 growthforecast-client is a ruby client library for GrowthForecast API where [GrowthForecast](http://kazeburo.github.com/GrowthForecast/) is a visualization graph tool.
 
+With growthforecast-client, for example, you can edit properties of a graph such as `color`, and create a complex graph.
+
 ## USAGE
 
     gem install growthforecast-client

@@ -5,8 +5,7 @@
 require 'growthforecast-client'
 
 # Create a GrowthForecast Client, given he base URI of GrowthForecast
-uri = 'http://localhost:5125'
-client = GrowthForecast::Client.new(uri)
+client = GrowthForecast::Client.new('http://localhost:5125')
 
 # I gonna apply for all services/sections
 sections = client.list_section
@@ -14,23 +13,25 @@ sections.each do |service_name, sections|
   sections.each do |section_name|
     # Make a complex graph from these graphs
     from_graphs= [
-      {"path" => "#{service_name}/#{section_name}/<1sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
-      {"path" => "#{service_name}/#{section_name}/<2sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
-      {"path" => "#{service_name}/#{section_name}/<3sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
-      {"path" => "#{service_name}/#{section_name}/<4sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
-      {"path" => "#{service_name}/#{section_name}/>=4sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
+      {"service_name" => service_name, "section_name" => section_name, "graph_name" => "<1sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
+      {"service_name" => service_name, "section_name" => section_name, "graph_name" => "<2sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
+      {"service_name" => service_name, "section_name" => section_name, "graph_name" => "<3sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
+      {"service_name" => service_name, "section_name" => section_name, "graph_name" => "<4sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
+      {"service_name" => service_name, "section_name" => section_name, "graph_name" => ">=4sec_count", "gmode" => 'gauge', "stack" => true, "type" => 'AREA'},
     ]
 
-    # The propety of a complex graph to create, e.g., path
+    # The propety of a complex graph to create
     to_complex = {
-      "path"         => "#{service_name}/#{section_name}/response_count",
-      "description"  => 'response time count',
+      "service_name" => service_name,
+      "section_name" => section_name,
+      "graph_name"   => "response_time_count",
+      "description"  => "response time count",
       "sort"         => 10,
     }
 
     # Create a complex graph!
     begin
-      puts "Setup #{to_complex["path"]}"
+      puts "Setup /#{service_name}/#{section_name}/#{to_complex['graph_name']}"
       client.create_complex(from_graphs, to_complex)
     rescue GrowthForecast::AlreadyExists => e
       puts "\tclass:#{e.class}\t#{e.message}"
