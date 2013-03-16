@@ -16,6 +16,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_runtime_dependency "httpclient"
+  gem.add_runtime_dependency "thor"
 
   # for testing
   gem.add_development_dependency "rake"
