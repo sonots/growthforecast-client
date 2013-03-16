@@ -3,7 +3,6 @@ require "bundler/setup"
 
 ENV['MOCK'] ||= 'on'
 require "pry"
-require 'debugger'
 require 'growthforecast/client'
 require 'webmock/rspec' if ENV['MOCK'] == 'on'
 
