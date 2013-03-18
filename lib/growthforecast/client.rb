@@ -61,8 +61,12 @@ module GrowthForecast
     #    "section_name"=>"hostname",
     #    "id"=>3},
     # ]
-    def list_graph
-      get_json('/json/list/graph')
+    def list_graph(service_name = nil, section_name = nil, graph_name = nil)
+      graphs = get_json('/json/list/graph')
+      graphs = graphs.select {|g| g['service_name'] == service_name } if service_name
+      graphs = graphs.select {|g| g['section_name'] == section_name } if section_name
+      graphs = graphs.select {|g| g['graph_name']   == graph_name   } if graph_name
+      graphs
     end
 
     # A Helper: Get the list of section
@@ -137,7 +141,7 @@ module GrowthForecast
     #  "sllimit"=>-100000,
     #  "md5"=>"3c59dc048e8850243be8079a5c74d079"}
     def get_graph(service_name, section_name, graph_name)
-      get_json("/api/#{service_name}/#{section_name}/#{graph_name}")
+      get_json("/api/#{e service_name}/#{e section_name}/#{e graph_name}")
     end
 
     # Get the propety of a graph, /json/graph/:id
@@ -176,7 +180,7 @@ module GrowthForecast
     # @param [String] graph_name
     # @param [Hash] params The POST parameters. See #get_graph
     def post_graph(service_name, section_name, graph_name, params)
-      post_query("/api/#{service_name}/#{section_name}/#{graph_name}", params)
+      post_query("/api/#{e service_name}/#{e section_name}/#{e graph_name}", params)
     end
 
     # Delete a graph, POST /delete/:service_name/:section_name/:graph_name
@@ -184,7 +188,7 @@ module GrowthForecast
     # @param [String] section_name
     # @param [String] graph_name
     def delete_graph(service_name, section_name, graph_name)
-      post_query("/delete/#{service_name}/#{section_name}/#{graph_name}")
+      post_query("/delete/#{e service_name}/#{e section_name}/#{e graph_name}")
     end
 
     # Update the property of a graph, /json/edit/graph/:id
@@ -283,6 +287,10 @@ module GrowthForecast
     end
 
     private
+
+    def e(str)
+      URI.escape(str) if str
+    end
 
     def client
       @client ||= HTTPClient.new

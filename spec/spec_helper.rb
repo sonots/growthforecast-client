@@ -3,7 +3,7 @@ require "bundler/setup"
 
 ENV['MOCK'] ||= 'on'
 require "pry"
-require 'growthforecast/client'
+require 'growthforecast-client'
 require 'webmock/rspec' if ENV['MOCK'] == 'on'
 
 ROOT = File.dirname(__FILE__)

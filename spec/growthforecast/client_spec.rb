@@ -10,14 +10,14 @@ shared_context "setup_growthforecast_client" do
   include_context "stub_post_graph" if ENV['MOCK'] == 'on'
   include_context "stub_delete_graph" if ENV['MOCK'] == 'on'
   before(:all) {
-    @client.delete_graph("app_name", "hostname", "<1sec_count") rescue nil
-    @client.delete_graph("app_name", "hostname", "<2sec_count") rescue nil
-    @client.post_graph("app_name", "hostname", "<1sec_count", { 'number' => 0 }) rescue nil
-    @client.post_graph("app_name", "hostname", "<2sec_count", { 'number' => 0 }) rescue nil
+    @client.delete_graph("app name", "host name", "<1sec count") rescue nil
+    @client.delete_graph("app name", "host name", "<2sec count") rescue nil
+    @client.post_graph("app name", "host name", "<1sec count", { 'number' => 0 }) rescue nil
+    @client.post_graph("app name", "host name", "<2sec count", { 'number' => 0 }) rescue nil
   }
   after(:all) {
-    @client.delete_graph("app_name", "hostname", "<1sec_count") rescue nil
-    @client.delete_graph("app_name", "hostname", "<2sec_count") rescue nil
+    @client.delete_graph("app name", "host name", "<1sec count") rescue nil
+    @client.delete_graph("app name", "host name", "<2sec count") rescue nil
   }
 end
 
@@ -80,9 +80,9 @@ describe GrowthForecast::Client do
     include_context "stub_delete_graph" if ENV['MOCK'] == 'on'
     let(:graph) {
       {
-        "service_name" => "app_name",
-        "section_name" => "hostname",
-        "graph_name"   => "<1sec_count",
+        "service_name" => "app name",
+        "section_name" => "host name",
+        "graph_name"   => "<1sec count",
       }
     }
     before  { @client.post_graph(graph['service_name'], graph['section_name'], graph['graph_name'], { 'number' => 0 }) }
@@ -143,7 +143,7 @@ describe GrowthForecast::Client do
         {
           "service_name" => graphs.first["service_name"],
           "section_name" => graphs.first["section_name"],
-          "graph_name"   => "complex_graph_test",
+          "graph_name"   => "complex graph test",
           "description"  => "complex graph test",
           "sort"         => 10
         }
