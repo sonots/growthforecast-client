@@ -5,13 +5,13 @@ base_uri = 'http://localhost:5125'
 shared_context "stub_list_graph" do
   let(:list_graph_example) {
     [
-      {"service_name"=>"app_name",
-       "section_name"=>"hostname",
-       "graph_name"=>"<1sec_count",
+      {"service_name"=>"app name",
+       "section_name"=>"host name",
+       "graph_name"=>"<1sec count",
        "id"=>1},
-       {"service_name"=>"app_name",
-        "section_name"=>"hostname",
-        "graph_name"=>"<2sec_count",
+       {"service_name"=>"app name",
+        "section_name"=>"host name",
+        "graph_name"=>"<2sec count",
         "id"=>2},
     ]
   }
@@ -33,14 +33,14 @@ shared_context "stub_get_graph" do
       "stype"=>"AREA",
       "adjustval"=>"1",
       "meta"=>"",
-      "service_name"=>"app_name",
+      "service_name"=>"app name",
       "gmode"=>"gauge",
       "color"=>"#cc6633",
       "created_at"=>"2013/02/02 00:41:11",
-      "section_name"=>"hostname",
+      "section_name"=>"host name",
       "ulimit"=>1000000000,
       "id"=>1,
-      "graph_name"=>"<1sec_count",
+      "graph_name"=>"<1sec count",
       "description"=>"",
       "sulimit"=>100000,
       "unit"=>"",
@@ -71,14 +71,14 @@ shared_context "stub_get_graph_by_id" do
       "stype"=>"AREA",
       "adjustval"=>"1",
       # "meta"=>"",
-      "service_name"=>"app_name",
+      "service_name"=>"app name",
       "gmode"=>"gauge",
       "color"=>"#cc6633",
       "created_at"=>"2013/02/02 00:41:11",
-      "section_name"=>"hostname",
+      "section_name"=>"host name",
       "ulimit"=>1000000000,
       "id"=>1,
-      "graph_name"=>"<1sec_count",
+      "graph_name"=>"<1sec count",
       "description"=>"",
       "sulimit"=>100000,
       "unit"=>"",
@@ -132,9 +132,9 @@ end
 shared_context "stub_list_complex" do
   let(:list_complex_example) {
     [
-      {"service_name"=>"app_name",
-       "section_name"=>"hostname",
-       "graph_name"=>"complex_graph_test",
+      {"service_name"=>"app name",
+       "section_name"=>"host name",
+       "graph_name"=>"complex graph test",
        "id"=>1},
     ]
   }
