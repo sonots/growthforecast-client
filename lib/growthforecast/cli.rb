@@ -1,8 +1,7 @@
 # -*- encoding: utf-8 -*-
 require 'thor'
 
-module CLI
-class GrowthforecastClient < Thor
+class GrowthForecast::CLI < Thor
   desc 'delete_graph <url>', 'delete a graph or graphs under a url'
   long_desc <<-LONGDESC
     Delete a graph or graphs under a <url> where <url> is the one obtained from the view, e.g., 
@@ -40,4 +39,4 @@ class GrowthforecastClient < Thor
     end
   end
 end
-end
+

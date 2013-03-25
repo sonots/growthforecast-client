@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe CLI::GrowthforecastClient do
+describe GrowthForecast::CLI do
   include_context "setup_growthforecast_client"
-  before(:all) { @cli = CLI::GrowthforecastClient.new }
+  before(:all) { @cli = GrowthForecast::CLI.new }
 
   context "#split_path" do
     context 'list service url' do

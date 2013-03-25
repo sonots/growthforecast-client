@@ -2,4 +2,4 @@
 # -*- encoding: utf-8 -*-
 
 require 'growthforecast-client'
-CLI::GrowthforecastClient.start(ARGV)
+Growthforecast::CLI.start(ARGV)
