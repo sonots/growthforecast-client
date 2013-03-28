@@ -22,6 +22,15 @@ class GrowthForecast::CLI < Thor
         puts "\tclass:#{e.class}\t#{e.message}"
       end
     end
+    graphs = client.list_complex(service_name, section_name, graph_name)
+    graphs.each do |graph|
+      begin
+        client.delete_complex(graph['service_name'], graph['section_name'], graph['graph_name'])
+        puts "Deleted #{e graph['service_name']}/#{e graph['section_name']}/#{e graph['graph_name']}"
+      rescue => e
+        puts "\tclass:#{e.class}\t#{e.message}"
+      end
+    end
   end
 
   no_tasks do

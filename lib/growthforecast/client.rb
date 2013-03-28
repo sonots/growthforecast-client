@@ -221,8 +221,12 @@ module GrowthForecast
     #    "section_name"=>"hostname",
     #    "id"=>3},
     # ]
-    def list_complex
-      get_json('/json/list/complex')
+    def list_complex(service_name = nil, section_name = nil, graph_name = nil)
+      graphs = get_json('/json/list/complex')
+      graphs = graphs.select {|g| g['service_name'] == service_name } if service_name
+      graphs = graphs.select {|g| g['section_name'] == section_name } if section_name
+      graphs = graphs.select {|g| g['graph_name']   == graph_name   } if graph_name
+      graphs
     end
 
     # Create a complex graph
