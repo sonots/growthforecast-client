@@ -11,18 +11,28 @@ module GrowthForecast
 
   class Client
     attr_accessor :debug
+    attr_accessor :client
+
     # @param [String] base_uri The base uri of GrowthForecast
     def initialize(base_uri = 'http://127.0.0.1:5125')
       @base_uri = base_uri
+    end
+
+    def client
+      @client ||= HTTPClient.new
+    end
+
+    def last_response
+      @res
     end
 
     # GET the JSON API
     # @param [String] path
     # @return [Hash] response body
     def get_json(path)
-      res = client.get("#{@base_uri}#{path}")
-      handle_error(res)
-      JSON.parse(res.body)
+      @res = client.get("#{@base_uri}#{path}")
+      handle_error(@res)
+      JSON.parse(@res.body)
     end
 
     # POST the JSON API
@@ -32,9 +42,9 @@ module GrowthForecast
     def post_json(path, data = {})
       pp data if @debug
       json = JSON.generate(data)
-      res = client.post("#{@base_uri}#{path}", json)
-      handle_error(res)
-      JSON.parse(res.body)
+      @res = client.post("#{@base_uri}#{path}", json)
+      handle_error(@res)
+      JSON.parse(@res.body)
     end
 
     # POST the non-JSON API
@@ -43,9 +53,9 @@ module GrowthForecast
     # @return [String] response body
     def post_query(path, data = {})
       pp data if @debug
-      res = client.post("#{@base_uri}#{path}", data)
-      handle_error(res)
-      JSON.parse(res.body)
+      @res = client.post("#{@base_uri}#{path}", data)
+      handle_error(@res)
+      JSON.parse(@res.body)
     end
 
     # Get the list of graphs, /json/list/graph
@@ -294,10 +304,6 @@ module GrowthForecast
 
     def e(str)
       URI.escape(str) if str
-    end
-
-    def client
-      @client ||= HTTPClient.new
     end
 
     def handle_error(res)
