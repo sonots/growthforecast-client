@@ -153,5 +153,18 @@ describe GrowthForecast::Client do
       after { @client.delete_complex(to_complex["service_name"], to_complex["section_name"], to_complex["graph_name"]) }
     end
   end
+
+  describe 'http://blog.64p.org/?page=1366971426' do
+    context "#client=" do
+      before { @client.client = HTTPClient.new(agent_name: 'TestAgent/0.1') }
+      it { @client.client.agent_name.should == 'TestAgent/0.1' }
+    end
+
+    context "#last_response" do
+      include_context "stub_list_graph" if ENV['MOCK'] == 'on'
+      subject { @client.last_response }
+      it { should be_kind_of HTTP::Message }
+    end
+  end
 end
 
