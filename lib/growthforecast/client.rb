@@ -268,7 +268,6 @@ module GrowthForecast
         :sort         => to_complex["sort"],
         :data         => graph_data
       }
-
       post_json('/json/create/complex', post_params)
     end
 
@@ -320,7 +319,7 @@ module GrowthForecast
     end
 
     def error_message(res)
-      "status:#{res.status}\turi:#{res.http_header.request_uri.to_s}"
+      "status:#{res.status}\turi:#{res.http_header.request_uri.to_s}\tmessage:#{res.body}"
     end
 
     # GrowthForecast's /json/edit/graph API requires all parameters to update, thus
