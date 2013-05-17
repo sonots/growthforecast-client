@@ -1,3 +1,9 @@
+# 0.0.6 (2013/05/17)
+
+Features:
+
+  - Add `#base_uri` method
+
 # 0.0.5 (2013/05/16)
 
 Features:
