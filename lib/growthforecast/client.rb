@@ -12,6 +12,7 @@ module GrowthForecast
   class Client
     attr_accessor :debug
     attr_accessor :client
+    attr_reader   :base_uri
 
     # @param [String] base_uri The base uri of GrowthForecast
     def initialize(base_uri = 'http://127.0.0.1:5125')
