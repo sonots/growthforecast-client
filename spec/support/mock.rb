@@ -53,7 +53,7 @@ shared_context "stub_get_graph" do
   end
 
   proc = Proc.new do
-    stub_request(:get, "#{base_uri}/api/#{graph['service_name']}/#{graph['section_name']}/#{graph['graph_name']}").
+    stub_request(:get, "#{base_uri}/api/#{e graph['service_name']}/#{e graph['section_name']}/#{e graph['graph_name']}").
     to_return(:status => 200, :body => graph_example.to_json)
   end
   before(:each, &proc)
@@ -98,16 +98,15 @@ end
 
 shared_context "stub_post_graph" do
   include_context "stub_get_graph"
-  proc = Proc.new do
-    stub_request(:post, "#{base_uri}/api/#{graph['service_name']}/#{graph['section_name']}/#{graph['graph_name']}").
+  before do
+    stub_request(:post, "#{base_uri}/api/#{e graph['service_name']}/#{e graph['section_name']}/#{e graph['graph_name']}").
     to_return(:status => 200, :body => { "error" => 0, "data" => graph_example }.to_json)
   end
-  before(:each, &proc)
 end
 
 shared_context "stub_delete_graph" do
   proc = Proc.new do
-    stub_request(:post, "#{base_uri}/delete/#{graph['service_name']}/#{graph['section_name']}/#{graph['graph_name']}").
+    stub_request(:post, "#{base_uri}/delete/#{e graph['service_name']}/#{e graph['section_name']}/#{e graph['graph_name']}").
     to_return(:status => 200, :body => { "error" => 0 }.to_json)
   end
   before(:each, &proc)
@@ -156,7 +155,7 @@ shared_context "stub_create_complex" do
 
   proc = Proc.new do
     list_graph_example.each do |graph|
-      stub_request(:get, "#{base_uri}/api/#{graph['service_name']}/#{graph['section_name']}/#{graph['graph_name']}").
+      stub_request(:get, "#{base_uri}/api/#{e graph['service_name']}/#{e graph['section_name']}/#{e graph['graph_name']}").
       to_return(:status => 200, :body => graph.to_json)
     end
 
