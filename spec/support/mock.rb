@@ -1,7 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-base_uri = 'http://localhost:5125'
-
 shared_context "stub_list_graph" do
   def list_graph_example
     [
@@ -17,7 +15,6 @@ shared_context "stub_list_graph" do
   end
 
   proc = Proc.new do
-    # WebMock.allow_net_connect!
     stub_request(:get, "#{base_uri}/json/list/graph").to_return(:status => 200, :body => list_graph_example.to_json)
   end
   before(:each, &proc)

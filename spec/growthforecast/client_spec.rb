@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe GrowthForecast::Client do
-  def client; GrowthForecast::Client.new('http://localhost:5125'); end
   include_context "setup_growthforecast_client"
   id_keys    = %w[id service_name section_name graph_name]
   graph_keys = %w[number llimit mode stype adjustval gmode color created_at ulimit description
