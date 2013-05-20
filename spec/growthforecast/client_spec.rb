@@ -73,7 +73,6 @@ describe GrowthForecast::Client do
 
   context "#delete_graph_by_id" do
     include_context "stub_post_graph" if ENV['MOCK'] == 'on'
-    include_context "stub_delete_graph" if ENV['MOCK'] == 'on'
     let(:graph) {
       {
         "service_name" => "app name",
@@ -81,11 +80,12 @@ describe GrowthForecast::Client do
         "graph_name"   => "<1sec count",
       }
     }
-    before do
+    let(:id) do
       ret = client.post_graph(graph['service_name'], graph['section_name'], graph['graph_name'], { 'number' => 0 })
-      @id = ret["data"]["id"]
+      ret["data"]["id"]
     end
-    subject { client.delete_graph_by_id(@id) }
+    include_context "stub_delete_graph_by_id" if ENV['MOCK'] == 'on'
+    subject { client.delete_graph_by_id(id) }
     it { subject["error"].should == 0 }
   end
 
@@ -138,6 +138,7 @@ describe GrowthForecast::Client do
 
   context "#get_complex" do
     include_context "stub_create_complex" if ENV['MOCK'] == 'on'
+    include_context "stub_get_complex" if ENV['MOCK'] == 'on'
     include_context "stub_delete_complex" if ENV['MOCK'] == 'on'
     before { client.create_complex(from_graphs, to_complex) }
     subject { client.get_complex(to_complex["service_name"], to_complex["section_name"], to_complex["graph_name"]) }
@@ -147,12 +148,14 @@ describe GrowthForecast::Client do
 
   context "#get_complex_by_id" do
     include_context "stub_create_complex" if ENV['MOCK'] == 'on'
-    include_context "stub_delete_complex" if ENV['MOCK'] == 'on'
+    include_context "stub_get_complex" if ENV['MOCK'] == 'on'
     before { client.create_complex(from_graphs, to_complex) }
-    before { @id = client.get_complex(to_complex["service_name"], to_complex["section_name"], to_complex["graph_name"])["id"] }
-    subject { client.get_complex_by_id(@id) }
+    let(:id) { client.get_complex(to_complex["service_name"], to_complex["section_name"], to_complex["graph_name"])["id"] }
+    include_context "stub_get_complex_by_id" if ENV['MOCK'] == 'on'
+    include_context "stub_delete_complex_by_id" if ENV['MOCK'] == 'on'
+    subject { client.get_complex_by_id(id) }
     complex_keys.each {|key| it { subject.should have_key(key) } }
-    after { client.delete_complex_by_id(@id) }
+    after { client.delete_complex_by_id(id) }
   end
 
   describe 'http://blog.64p.org/?page=1366971426' do
