@@ -59,13 +59,6 @@ describe GrowthForecast::Client do
   context "#delete_graph" do
     include_context "stub_post_graph" if ENV['MOCK'] == 'on'
     include_context "stub_delete_graph" if ENV['MOCK'] == 'on'
-    let(:graph) {
-      {
-        "service_name" => "app name",
-        "section_name" => "host name",
-        "graph_name"   => "<1sec count",
-      }
-    }
     before { client.post_graph(graph['service_name'], graph['section_name'], graph['graph_name'], { 'number' => 0 }) }
     subject { client.delete_graph(graph['service_name'], graph['section_name'], graph['graph_name']) }
     it { subject["error"].should == 0 }

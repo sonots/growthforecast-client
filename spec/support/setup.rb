@@ -6,8 +6,22 @@ shared_context "setup_growthforecast_client" do
   let(:graph) { graphs.first }
   let(:from_graphs) do
     [
-      graphs[0],
-      graphs[1],
+      {
+        "service_name" => graphs[0]["service_name"],
+        "section_name" => graphs[0]["section_name"],
+        "graph_name"   => graphs[0]["graph_name"],
+        "gmode" => "gauge",
+        "stack" => false,
+        "type" => "AREA",
+      },
+      {
+        "service_name" => graphs[1]["service_name"],
+        "section_name" => graphs[1]["section_name"],
+        "graph_name"   => graphs[1]["graph_name"],
+        "gmode" => "gauge",
+        "stack" => false,
+        "type" => "AREA"
+      },
     ]
   end
   let(:to_complex) do
@@ -22,13 +36,13 @@ shared_context "setup_growthforecast_client" do
 
   include_context "stub_post_graph" if ENV['MOCK'] == 'on'
   include_context "stub_delete_graph" if ENV['MOCK'] == 'on'
-  before(:all) {
+  before {
     client.delete_graph("app name", "host name", "<1sec count") rescue nil
     client.delete_graph("app name", "host name", "<2sec count") rescue nil
     client.post_graph("app name", "host name", "<1sec count", { 'number' => 0 }) rescue nil
     client.post_graph("app name", "host name", "<2sec count", { 'number' => 0 }) rescue nil
   }
-  after(:all) {
+  after {
     client.delete_graph("app name", "host name", "<1sec count") rescue nil
     client.delete_graph("app name", "host name", "<2sec count") rescue nil
   }

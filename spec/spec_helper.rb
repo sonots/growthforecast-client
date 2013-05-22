@@ -15,8 +15,12 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
 end
 
+def u(str)
+  CGI.unescape(str.gsub('%20', '+')) if str
+end
+
 def e(str)
-  URI.escape(str) if str
+  CGI.escape(str).gsub('+', '%20') if str
 end
 
 def base_uri

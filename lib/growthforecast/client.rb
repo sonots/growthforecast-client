@@ -374,7 +374,7 @@ module GrowthForecast
     private
 
     def e(str)
-      URI.escape(str) if str
+      CGI.escape(str).gsub('+', '%20') if str
     end
 
     def handle_error(res)
