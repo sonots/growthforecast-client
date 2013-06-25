@@ -6,6 +6,7 @@ require 'growthforecast-client'
 
 # Create a GrowthForecast Client, given he base URI of GrowthForecast
 client = GrowthForecast::Client.new('http://localhost:5125')
+client.debug_dev = STDOUT # debug print the http requests and responses
 
 # configure colors of graphs whose names are as belows:
 graph_colors = {

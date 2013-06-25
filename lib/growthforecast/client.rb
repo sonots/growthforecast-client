@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 require 'httpclient'
 require 'json'
-require 'uri'
+require 'cgi'
 require 'pp'
 
 module GrowthForecast
@@ -12,6 +12,7 @@ module GrowthForecast
   class Client
     attr_accessor :debug
     attr_accessor :client
+    attr_reader   :debug_dev
     attr_reader   :base_uri
 
     # @param [String] base_uri The base uri of GrowthForecast
@@ -21,6 +22,12 @@ module GrowthForecast
 
     def client
       @client ||= HTTPClient.new
+    end
+
+    # set the `debug_dev` attribute of HTTPClient
+    # @param [IO] debug_dev such as STDOUT
+    def debug_dev=(debug_dev)
+      client.debug_dev = debug_dev
     end
 
     def last_response
