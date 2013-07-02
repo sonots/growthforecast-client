@@ -35,12 +35,12 @@ class GrowthForecast::CLI < Thor
 
   no_tasks do
     def e(str)
-      URI.escape(str) if str
+      CGI.escape(str).gsub('+', '%20') if str
     end
 
     def split_path(path)
       path = path.gsub(/.*list\//, '').gsub(/.*view_graph\//, '')
-      path.split('/').map {|p| URI.unescape(p) }
+      path.split('/').map {|p| CGI.unescape(p.gsub('%20', '+')) }
     end
 
     def client(uri)
