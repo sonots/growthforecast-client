@@ -128,6 +128,42 @@ module GrowthForecast
       services.keys
     end
 
+    # Post parameters to a graph, POST /api/:service_name/:section_name/:graph_name
+    # @param [String] service_name
+    # @param [String] section_name
+    # @param [String] graph_name
+    # @param [Hash] params The POST parameters. See #get_graph
+    # @return [Hash] the error code and graph property
+    # @example
+    #{"error"=>0,
+    #"data"=>{
+    #  "number"=>1,
+    #  "llimit"=>-1000000000,
+    #  "mode"=>"gauge",
+    #  "stype"=>"AREA",
+    #  "adjustval"=>"1",
+    #  "meta"=>"",
+    #  "service_name"=>"test",
+    #  "gmode"=>"gauge",
+    #  "color"=>"#cc6633",
+    #  "created_at"=>"2013/02/02 00:41:11",
+    #  "section_name"=>"hostname",
+    #  "ulimit"=>1000000000,
+    #  "id"=>21,
+    #  "graph_name"=>"<4sec_count",
+    #  "description"=>"",
+    #  "sulimit"=>100000,
+    #  "unit"=>"",
+    #  "sort"=>0,
+    #  "updated_at"=>"2013/02/02 02:32:10",
+    #  "adjust"=>"*",
+    #  "type"=>"AREA",
+    #  "sllimit"=>-100000,
+    #  "md5"=>"3c59dc048e8850243be8079a5c74d079"}}
+    def post_graph(service_name, section_name, graph_name, params)
+      post_query("/api/#{e service_name}/#{e section_name}/#{e graph_name}", params)
+    end
+
     # Get the propety of a graph, GET /api/:service_name/:section_name/:graph_name
     # @param [String] service_name
     # @param [String] section_name
@@ -192,21 +228,18 @@ module GrowthForecast
       get_json("/json/graph/#{id}")
     end
 
-    # Post parameters to a graph, POST /api/:service_name/:section_name/:graph_name
-    # @param [String] service_name
-    # @param [String] section_name
-    # @param [String] graph_name
-    # @param [Hash] params The POST parameters. See #get_graph
-    def post_graph(service_name, section_name, graph_name, params)
-      post_query("/api/#{e service_name}/#{e section_name}/#{e graph_name}", params)
-    end
-
     # Delete a graph, POST /delete/:service_name/:section_name/:graph_name
     # @param [String] service_name
     # @param [String] section_name
     # @param [String] graph_name
     def delete_graph(service_name, section_name, graph_name)
       post_query("/delete/#{e service_name}/#{e section_name}/#{e graph_name}")
+    end
+
+    # Delete a graph, POST /json/delete/graph/:id
+    # @param [String] id
+    def delete_graph_by_id(id)
+      post_query("/json/delete/graph/#{id}")
     end
 
     # Update the property of a graph, /json/edit/graph/:id
@@ -278,6 +311,40 @@ module GrowthForecast
       post_json('/json/create/complex', post_params)
     end
 
+    # Get the propety of a complex graph, GET /json/complex/:service_name/:section_name/:graph_name
+    # @param [String] service_name
+    # @param [String] section_name
+    # @param [String] graph_name
+    # @return [Hash] the graph property
+    # @version 0.70 or more
+    # @example
+    # {"number"=>0,
+    #  "complex"=>true,
+    #  "created_at"=>"2013/05/20 15:08:28",
+    #  "service_name"=>"app name",
+    #  "section_name"=>"host name",
+    #  "id"=>18,
+    #  "graph_name"=>"complex graph test",
+    #  "data"=>
+    #   [{"gmode"=>"gauge", "stack"=>false, "type"=>"AREA", "graph_id"=>218},
+    #    {"gmode"=>"gauge", "stack"=>true, "type"=>"AREA", "graph_id"=>217}],
+    #  "sumup"=>false,
+    #  "description"=>"complex graph test",
+    #  "sort"=>10,
+    #  "updated_at"=>"2013/05/20 15:08:28"}
+    def get_complex(service_name, section_name, graph_name)
+      get_json("/json/complex/#{e service_name}/#{e section_name}/#{e graph_name}")
+    end
+
+    # Get the propety of a complex graph, GET /json/complex/:id
+    # @param [String] id
+    # @return [Hash] the graph property
+    # @version 0.70 or more
+    # @example See #get_complex
+    def get_complex_by_id(id)
+      get_json("/json/complex/#{id}")
+    end
+
     # Delete a complex graph
     #
     # This is a helper method of GrowthForecast API to find complex graph id and call delete_complex_by_id
@@ -290,10 +357,7 @@ module GrowthForecast
     # {"error"=>0} #=> Success
     # {"error"=>1} #=> Error
     def delete_complex(service_name, section_name, graph_name)
-      complex_graphs = list_complex
-      complex = complex_graphs.select {|g| g["service_name"] == service_name and g["section_name"] == section_name and g["graph_name"] == graph_name }
-      raise NotFound if complex.empty?
-      delete_complex_by_id(complex.first["id"])
+      post_query("/json/delete/complex/#{e service_name}/#{e section_name}/#{e graph_name}")
     end
 
     # Delete a complex graph, /delete_complex/:complex_id
@@ -310,7 +374,7 @@ module GrowthForecast
     private
 
     def e(str)
-      URI.escape(str) if str
+      CGI.escape(str).gsub('+', '%20') if str
     end
 
     def handle_error(res)

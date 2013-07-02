@@ -109,6 +109,14 @@ shared_context "stub_delete_graph" do
   before(:each, &proc)
 end
 
+shared_context "stub_delete_graph_by_id" do
+  proc = Proc.new do
+    stub_request(:post, "#{base_uri}/json/delete/graph/#{id}").
+    to_return(:status => 200, :body => { "error" => 0 }.to_json)
+  end
+  before(:each, &proc)
+end
+
 shared_context "stub_edit_graph" do
   include_context "stub_get_graph"
 
@@ -128,9 +136,6 @@ shared_context "stub_list_complex" do
        "id"=>1},
     ]
   end
-  def complex_example
-    list_complex_example.first
-  end
 
   proc = Proc.new do
     stub_request(:get, "#{base_uri}/json/list/complex").
@@ -139,9 +144,67 @@ shared_context "stub_list_complex" do
   before(:each, &proc)
 end
 
+shared_context "stub_get_complex" do
+  def complex_example
+    {"number"=>0,
+     "complex"=>true,
+     "created_at"=>"2013/05/20 15:08:28",
+     "service_name"=>"app name",
+     "section_name"=>"host name",
+     "id"=>1,
+     "graph_name"=>"complex graph test",
+     "data"=>
+    [{"gmode"=>"gauge", "stack"=>false, "type"=>"AREA", "graph_id"=>218},
+     {"gmode"=>"gauge", "stack"=>true, "type"=>"AREA", "graph_id"=>217}],
+    "sumup"=>false,
+    "description"=>"complex graph test",
+    "sort"=>10,
+    "updated_at"=>"2013/05/20 15:08:28"}
+  end
+
+  proc = Proc.new do
+    stub_request(:get, "#{base_uri}/json/complex/#{e to_complex['service_name']}/#{e to_complex['section_name']}/#{e to_complex['graph_name']}").
+    to_return(:status => 200, :body => complex_example.to_json)
+  end
+  before(:each, &proc)
+end
+
+shared_context "stub_get_complex_by_id" do
+  def complex_example
+    {"number"=>0,
+     "complex"=>true,
+     "created_at"=>"2013/05/20 15:08:28",
+     "service_name"=>"app name",
+     "section_name"=>"host name",
+     "id"=>1,
+     "graph_name"=>"complex graph test",
+     "data"=>
+    [{"gmode"=>"gauge", "stack"=>false, "type"=>"AREA", "graph_id"=>218},
+     {"gmode"=>"gauge", "stack"=>true, "type"=>"AREA", "graph_id"=>217}],
+    "sumup"=>false,
+    "description"=>"complex graph test",
+    "sort"=>10,
+    "updated_at"=>"2013/05/20 15:08:28"}
+  end
+
+  proc = Proc.new do
+    stub_request(:get, "#{base_uri}/json/complex/#{id}").
+    to_return(:status => 200, :body => complex_example.to_json)
+  end
+  before(:each, &proc)
+end
+
 shared_context "stub_delete_complex" do
   proc = Proc.new do
-    stub_request(:post, "#{base_uri}/delete_complex/#{complex_example['id']}").
+    stub_request(:post, "#{base_uri}/json/delete/complex/#{e to_complex['service_name']}/#{e to_complex['section_name']}/#{e to_complex['graph_name']}").
+    to_return(:status => 200, :body => { "error" => 0 }.to_json)
+  end
+  before(:each, &proc)
+end
+
+shared_context "stub_delete_complex_by_id" do
+  proc = Proc.new do
+    stub_request(:post, "#{base_uri}/delete_complex/#{id}").
     to_return(:status => 200, :body => { "error" => 0 }.to_json)
   end
   before(:each, &proc)

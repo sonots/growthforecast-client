@@ -5,6 +5,8 @@ describe GrowthForecast::Client do
   id_keys    = %w[id service_name section_name graph_name]
   graph_keys = %w[number llimit mode stype adjustval gmode color created_at ulimit description
                   sulimit unit sort updated_at adjust type sllimit meta md5]
+  complex_keys = %w[number complex created_at service_name section_name id graph_name data sumup
+                    description sort updated_at]
 
   context "#list_graph" do
     include_context "stub_list_graph" if ENV['MOCK'] == 'on'
@@ -57,6 +59,13 @@ describe GrowthForecast::Client do
   context "#delete_graph" do
     include_context "stub_post_graph" if ENV['MOCK'] == 'on'
     include_context "stub_delete_graph" if ENV['MOCK'] == 'on'
+    before { client.post_graph(graph['service_name'], graph['section_name'], graph['graph_name'], { 'number' => 0 }) }
+    subject { client.delete_graph(graph['service_name'], graph['section_name'], graph['graph_name']) }
+    it { subject["error"].should == 0 }
+  end
+
+  context "#delete_graph_by_id" do
+    include_context "stub_post_graph" if ENV['MOCK'] == 'on'
     let(:graph) {
       {
         "service_name" => "app name",
@@ -64,8 +73,12 @@ describe GrowthForecast::Client do
         "graph_name"   => "<1sec count",
       }
     }
-    before { client.post_graph(graph['service_name'], graph['section_name'], graph['graph_name'], { 'number' => 0 }) }
-    subject { client.delete_graph(graph['service_name'], graph['section_name'], graph['graph_name']) }
+    let(:id) do
+      ret = client.post_graph(graph['service_name'], graph['section_name'], graph['graph_name'], { 'number' => 0 })
+      ret["data"]["id"]
+    end
+    include_context "stub_delete_graph_by_id" if ENV['MOCK'] == 'on'
+    subject { client.delete_graph_by_id(id) }
     it { subject["error"].should == 0 }
   end
 
@@ -111,26 +124,31 @@ describe GrowthForecast::Client do
   context "#create_complex" do
     include_context "stub_create_complex" if ENV['MOCK'] == 'on'
     include_context "stub_delete_complex" if ENV['MOCK'] == 'on'
-    context "normal" do
-      let(:from_graphs) do
-        [
-          graphs[0],
-          graphs[1],
-        ]
-      end
-      let(:to_complex) do
-        {
-          "service_name" => graphs.first["service_name"],
-          "section_name" => graphs.first["section_name"],
-          "graph_name"   => "complex graph test",
-          "description"  => "complex graph test",
-          "sort"         => 10
-        }
-      end
-      subject { client.create_complex(from_graphs, to_complex) }
-      it { subject["error"].should == 0 }
-      after { client.delete_complex(to_complex["service_name"], to_complex["section_name"], to_complex["graph_name"]) }
-    end
+    subject { client.create_complex(from_graphs, to_complex) }
+    it { subject["error"].should == 0 }
+    after { client.delete_complex(to_complex["service_name"], to_complex["section_name"], to_complex["graph_name"]) }
+  end
+
+  context "#get_complex" do
+    include_context "stub_create_complex" if ENV['MOCK'] == 'on'
+    include_context "stub_get_complex" if ENV['MOCK'] == 'on'
+    include_context "stub_delete_complex" if ENV['MOCK'] == 'on'
+    before { client.create_complex(from_graphs, to_complex) }
+    subject { client.get_complex(to_complex["service_name"], to_complex["section_name"], to_complex["graph_name"]) }
+    complex_keys.each {|key| it { subject.should have_key(key) } }
+    after { client.delete_complex(to_complex["service_name"], to_complex["section_name"], to_complex["graph_name"]) }
+  end
+
+  context "#get_complex_by_id" do
+    include_context "stub_create_complex" if ENV['MOCK'] == 'on'
+    include_context "stub_get_complex" if ENV['MOCK'] == 'on'
+    before { client.create_complex(from_graphs, to_complex) }
+    let(:id) { client.get_complex(to_complex["service_name"], to_complex["section_name"], to_complex["graph_name"])["id"] }
+    include_context "stub_get_complex_by_id" if ENV['MOCK'] == 'on'
+    include_context "stub_delete_complex_by_id" if ENV['MOCK'] == 'on'
+    subject { client.get_complex_by_id(id) }
+    complex_keys.each {|key| it { subject.should have_key(key) } }
+    after { client.delete_complex_by_id(id) }
   end
 
   describe 'http://blog.64p.org/?page=1366971426' do

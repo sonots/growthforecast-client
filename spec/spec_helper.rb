@@ -5,6 +5,7 @@ ENV['MOCK'] ||= 'on'
 require "pry"
 require 'growthforecast-client'
 require 'webmock/rspec'
+require 'cgi'
 WebMock.allow_net_connect! if ENV['MOCK'] == 'off'
 
 ROOT = File.dirname(__FILE__)
@@ -15,8 +16,12 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
 end
 
+def u(str)
+  ::CGI.unescape(str.gsub('%20', '+')) if str
+end
+
 def e(str)
-  URI.escape(str) if str
+  ::CGI.escape(str).gsub('+', '%20') if str
 end
 
 def base_uri
