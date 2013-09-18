@@ -18,7 +18,7 @@ See [examples](examples) directory.
 
 `growthforecast-client` also provides a CLI.
 
-Delete a graph or graphs under a path:
+Delete a graph or graphs under a path (copy and paste the URL from your GrowthForecast): 
 
 ```
 $ growthforecast-client delete_graph 'http://fqdn.to.growthforecast:5125/list/service_name'
