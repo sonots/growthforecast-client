@@ -14,6 +14,22 @@ With growthforecast-client, for example, you can edit properties of a graph such
 
 See [examples](examples) directory.
 
+### CLI
+
+`growthforecast-client` also provides a CLI.
+
+Delete a graph or graphs under a path:
+
+```
+$ growthforecast-client delete_graph 'http://fqdn.to.growthforecast:5125/service_name'
+```
+
+See help for more:
+
+```
+$ growthforecast-client help
+```
+
 ## Contributing
 
 1. Fork it
