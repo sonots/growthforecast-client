@@ -21,7 +21,7 @@ See [examples](examples) directory.
 Delete a graph or graphs under a path:
 
 ```
-$ growthforecast-client delete_graph 'http://fqdn.to.growthforecast:5125/service_name'
+$ growthforecast-client delete_graph 'http://fqdn.to.growthforecast:5125/list/service_name'
 ```
 
 See help for more:
