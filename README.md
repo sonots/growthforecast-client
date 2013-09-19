@@ -16,7 +16,7 @@ See [examples](examples) directory.
 
 ### CLI
 
-`growthforecast-client` also provides a CLI.
+GrowthForecast Client also provides a CLI named `growthforecast-client`.
 
 Delete a graph or graphs under a path (copy and paste the URL from your GrowthForecast): 
 
