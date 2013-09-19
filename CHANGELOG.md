@@ -1,3 +1,9 @@
+# 0.62.2 (2013/09/19)
+
+Changes:
+
+  - Change option -u to an argument of `color`, `create_complex` command
+
 # 0.62.1 (2013/09/19)
 
 Features:
