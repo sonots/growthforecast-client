@@ -82,13 +82,7 @@ class GrowthForecast::CLI < Thor
         service_name, section_name, graph_name = graph['service_name'], graph['section_name'], graph['graph_name']
         next unless color = colors[graph_name]
 
-        params = {
-          'color'  => color,
-          'unit'   => 'count',
-          'sort'   => 1, # order to display, 19 is the top
-          'adjust' => '/',
-          'adjustval' => '1',
-        }
+        params = { 'color'  => color }
         puts "Setup #{service_name}/#{section_name}/#{graph_name} with #{color}" unless @options[:silent]
         exec { @client.edit_graph(service_name, section_name, graph_name, params) }
       end
@@ -102,9 +96,9 @@ class GrowthForecast::CLI < Thor
 
         base = { "service_name" => service_name, "section_name" => section_name, "gmode" => 'gauge', "stack" => true, "type" => 'AREA' }
         from_graphs_params = from_graphs.map {|graph_name| base.merge('graph_name' => graph_name) }
-        to_complex_params = { "service_name" => service_name, "section_name" => section_name, "graph_name" => to_complex, "sort" => 1 }
+        to_complex_params = { "service_name" => service_name, "section_name" => section_name, "graph_name" => to_complex, "sort" => 0 }
 
-        puts "Setup /#{service_name}/#{section_name}/#{to_complex} with #{from_graphs}" unless @options[:silent]
+        puts "Setup #{service_name}/#{section_name}/#{to_complex} with #{from_graphs}" unless @options[:silent]
         exec { @client.create_complex(from_graphs_params, to_complex_params) }
       end
     end
