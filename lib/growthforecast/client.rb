@@ -100,8 +100,8 @@ module GrowthForecast
     #     "section_name2",
     #   ],
     # }
-    def list_section
-      graphs = list_graph
+    def list_section(service_name = nil, section_name = nil, graph_name = nil)
+      graphs = list_graph(service_name, section_name, graph_name)
       services = {}
       graphs.each do |graph|
         service_name, section_name = graph['service_name'], graph['section_name']
@@ -118,8 +118,8 @@ module GrowthForecast
     #   "service_name1",
     #   "service_name2",
     # ]
-    def list_service
-      graphs = list_graph
+    def list_service(service_name = nil, section_name = nil, graph_name = nil)
+      graphs = list_graph(service_name, section_name, graph_name)
       services = {}
       graphs.each do |graph|
         service_name = graph['service_name']
