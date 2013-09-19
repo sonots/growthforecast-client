@@ -35,16 +35,15 @@ class GrowthForecast::CLI < Thor
     end
   end
 
-  desc 'color', 'change the color of graphs'
+  desc 'color <url>', 'change the color of graphs'
   long_desc <<-LONGDESC
     Change the color of graphs
 
-    ex) growthforecast-client color -c "2xx_count:#1111cc" "3xx_count:#11cc11" -u 'http://{hostname}:{port}/list/{service_name}/{section_name}'
+    ex) growthforecast-client color 'http://{hostname}:{port}/list/{service_name}/{section_name}' -c '2xx_count:#1111cc' '3xx_count:#11cc11'
   LONGDESC
   option :colors, :type => :hash,   :aliases => '-c', :required => true, :banner => 'GRAPH_NAME:COLOR ...'
-  option :url,    :type => :string, :aliases => '-u', :required => true
-  def color
-    colors, url = options[:colors], options[:url]
+  def color(url)
+    colors = options[:colors]
 
     uri = URI.parse(url)
     client = client(uri)
@@ -70,17 +69,16 @@ class GrowthForecast::CLI < Thor
     end
   end
 
-  desc 'create_complex', 'create complex graphs'
+  desc 'create_complex <url>', 'create complex graphs'
   long_desc <<-LONGDESC
     Create complex graphs under a url
 
-    ex) growthforecast-client create_complex -f 2xx_count 3xx_count -t status_count -u 'http://{hostname}:{port}/list/{service_name}'
+    ex) growthforecast-client create_complex 'http://{hostname}:{port}/list/{service_name}' -f 2xx_count 3xx_count -t status_count
   LONGDESC
   option :from_graphs, :type => :array,  :aliases => '-f', :required => true, :banner => 'GRAPH_NAMES ...'
   option :to_complex,  :type => :string, :aliases => '-t', :required => true
-  option :url,  :type => :string, :aliases => '-u', :required => true
-  def create_complex
-    from_graphs, to_complex, url = options[:from_graphs], options[:to_complex], options[:url]
+  def create_complex(url)
+    from_graphs, to_complex = options[:from_graphs], options[:to_complex]
 
     uri = URI.parse(url)
     client = client(uri)
