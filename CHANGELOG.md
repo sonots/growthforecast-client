@@ -1,3 +1,20 @@
+# 0.62.1 (2013/09/19)
+
+Features:
+
+  - Add `growthforecast-client color` command
+  - Add `growthforecast-client create_complex` command
+
+Changes:
+
+  - Change `growthforecast-client delete_graph` to `delete` command
+
+# 0.62.0 (2013/07/02)
+
+Changes:
+
+  - Version up!
+
 # 0.0.6 (2013/05/17)
 
 Features:
