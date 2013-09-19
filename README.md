@@ -21,7 +21,13 @@ See [examples](examples) directory.
 Delete a graph or graphs under a path (copy and paste the URL from your GrowthForecast): 
 
 ```
-$ growthforecast-client delete_graph 'http://fqdn.to.growthforecast:5125/list/service_name'
+$ growthforecast-client delete 'http://fqdn.to.growthforecast:5125/list/service_name'
+```
+
+Change the colors of graphs
+
+```
+$ growthforecast-client color 'http://fqdn.to.growthforecast:5125/list/service_name' -c 'graph_name:#1111cc' ...
 ```
 
 See help for more:
