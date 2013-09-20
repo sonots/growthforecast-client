@@ -1,3 +1,9 @@
+# 0.62.3 (2013/09/20)
+
+Features:
+
+  - Add -g and -s options to `delete` command
+
 # 0.62.2 (2013/09/19)
 
 Changes:
