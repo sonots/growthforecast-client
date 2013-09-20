@@ -17,15 +17,19 @@ class GrowthForecast::CLI < Thor
 
     ex) growthforecast-client delete 'http://{hostname}:{port}/list/{service_name}/{section_name}'
   LONGDESC
+  option :section_names, :type => :array, :aliases => '-s'
+  option :graph_names,   :type => :array, :aliases => '-g'
   def delete(url)
+    section_names, graph_names = options[:section_names], options[:graph_names]
+
     base_uri, service_name, section_name, graph_name = split_url(url)
     @client = client(base_uri)
 
     graphs = @client.list_graph(service_name, section_name, graph_name)
-    delete_graphs(graphs)
+    delete_graphs(graphs, section_names, graph_names)
 
     complexes = @client.list_complex(service_name, section_name, graph_name)
-    delete_complexes(complexes)
+    delete_complexes(complexes, section_names, graph_names)
   end
 
   desc 'color <url>', 'change the color of graphs'
@@ -63,17 +67,25 @@ class GrowthForecast::CLI < Thor
   end
 
   no_tasks do
-    def delete_graphs(graphs)
+    def delete_graphs(graphs, section_names = nil, graph_names = nil)
       graphs.each do |graph|
-        puts "Delete #{e graph['service_name']}/#{e graph['section_name']}/#{e graph['graph_name']}" unless @options[:silent]
-        exec { @client.delete_graph(graph['service_name'], graph['section_name'], graph['graph_name']) }
+        service_name, section_name, graph_name = graph['service_name'], graph['section_name'], graph['graph_name']
+        next if section_names and !section_names.include?(section_name)
+        next if graph_names   and !graph_names.include?(graph_name)
+
+        puts "Delete #{service_name}/#{section_name}/#{graph_name}" unless @options[:silent]
+        exec { @client.delete_graph(service_name, section_name, graph_name) }
       end
     end
 
-    def delete_complexes(complexes)
+    def delete_complexes(complexes, section_names = nil, graph_names = nil)
       complexes.each do |graph|
-        puts "Delete #{e graph['service_name']}/#{e graph['section_name']}/#{e graph['graph_name']}" unless @options[:silent]
-        exec { @client.delete_complex(graph['service_name'], graph['section_name'], graph['graph_name']) }
+        service_name, section_name, graph_name = graph['service_name'], graph['section_name'], graph['graph_name']
+        next if section_names and !section_names.include?(section_name)
+        next if graph_names   and !graph_names.include?(graph_name)
+
+        puts "Delete #{service_name}/#{section_name}/#{graph_name}" unless @options[:silent]
+        exec { @client.delete_complex(service_name, section_name, graph_name) }
       end
     end
 
@@ -109,10 +121,6 @@ class GrowthForecast::CLI < Thor
       rescue => e
         $stderr.puts "\tclass:#{e.class}\t#{e.message}"
       end
-    end
-
-    def e(str)
-      CGI.escape(str).gsub('+', '%20') if str
     end
 
     def client(base_uri)
