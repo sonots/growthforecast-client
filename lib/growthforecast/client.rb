@@ -30,6 +30,10 @@ module GrowthForecast
       client.debug_dev = debug_dev
     end
 
+    def last_request_uri
+      @request_uri
+    end
+
     def last_response
       @res
     end
@@ -38,7 +42,8 @@ module GrowthForecast
     # @param [String] path
     # @return [Hash] response body
     def get_json(path)
-      @res = client.get("#{@base_uri}#{path}")
+      @request_uri = "#{@base_uri}#{path}" 
+      @res = client.get(@request_uri)
       handle_error(@res)
       JSON.parse(@res.body)
     end
@@ -49,8 +54,9 @@ module GrowthForecast
     # @return [Hash] response body
     def post_json(path, data = {})
       pp data if @debug
+      @request_uri = "#{@base_uri}#{path}" 
       json = JSON.generate(data)
-      @res = client.post("#{@base_uri}#{path}", json)
+      @res = client.post(@request_uri, json)
       handle_error(@res)
       JSON.parse(@res.body)
     end
@@ -61,7 +67,8 @@ module GrowthForecast
     # @return [String] response body
     def post_query(path, data = {})
       pp data if @debug
-      @res = client.post("#{@base_uri}#{path}", data)
+      @request_uri = "#{@base_uri}#{path}" 
+      @res = client.post(@request_uri, data)
       handle_error(@res)
       JSON.parse(@res.body)
     end

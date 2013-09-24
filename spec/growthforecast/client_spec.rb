@@ -164,6 +164,13 @@ describe GrowthForecast::Client do
       subject { @client.last_response }
       it { should be_kind_of HTTP::Message }
     end
+
+    context "#last_request_uri" do
+      include_context "stub_list_graph" if ENV['MOCK'] == 'on'
+      before { @client.list_graph }
+      subject { @client.last_request_uri }
+      it { should == "http://localhost:5125/json/list/graph" }
+    end
   end
 end
 
