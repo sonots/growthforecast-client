@@ -1,4 +1,4 @@
-# GrowthForecast Client [![Build Status](https://secure.travis-ci.org/sonots/growthforecast-client.png?branch=master)](http://travis-ci.org/sonots/growthforecast-client) [![Dependency Status](https://gemnasium.com/sonots/growthforecast-client.png)](https://gemnasium.com/sonots/growthforecast-client)
+# GrowthForecast Client [![Build Status](https://secure.travis-ci.org/sonots/growthforecast-client.png?branch=master)](http://travis-ci.org/sonots/growthforecast-client)
 
 testing ruby: 1.9.2, 1.9.3, 2.0.0; GrowthForecast: >= 0.62 (Jun 27, 2013 released)
 
