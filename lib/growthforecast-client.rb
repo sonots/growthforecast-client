@@ -1,2 +1,2 @@
-require 'growthforecast/client'
-require 'growthforecast/cli'
+require_relative 'growthforecast/client'
+require_relative 'growthforecast/cli'
