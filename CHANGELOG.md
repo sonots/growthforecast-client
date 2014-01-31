@@ -1,3 +1,10 @@
+# 0.62.4 (2014/02/01)
+
+Features:
+
+  - Add `keepalive` option
+  - Proxy httpclient parameters
+
 # 0.62.3 (2013/09/20)
 
 Features:
