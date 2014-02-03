@@ -162,7 +162,7 @@ describe GrowthForecast::Client do
       include_context "stub_list_graph" if ENV['MOCK'] == 'on'
       before { @client.list_graph }
       subject { @client.last_response }
-      it { should be_kind_of HTTP::Message }
+      it { should be_kind_of Net::HTTPResponse }
     end
 
     context "#last_request_uri" do

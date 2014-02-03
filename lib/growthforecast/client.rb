@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
-require 'httpclient'
+require 'net/http'
+require 'uri'
 require 'json'
 require 'cgi'
-require 'pp'
 
 module GrowthForecast
   class Error < StandardError; end
@@ -10,124 +10,45 @@ module GrowthForecast
   class AlreadyExists < Error; end
 
   class Client
-    attr_accessor :debug
     attr_accessor :client
     attr_reader   :base_uri
-    attr_accessor :keepalive
+    attr_reader   :debug_dev
+    attr_reader   :open_timeout
+    attr_reader   :read_timeout
+    attr_reader   :keepalive
 
     # @param [String] base_uri The base uri of GrowthForecast
     def initialize(base_uri = 'http://127.0.0.1:5125', opts = {})
-      @client = HTTPClient.new
       @base_uri = base_uri
+      URI.parse(base_uri).tap {|uri|
+        @client = Net::HTTP.new(uri.host, uri.port)
+        @client.use_ssl = uri.scheme == 'https'
+      }
+
       opts = stringify_keys(opts)
-      @keepalive = opts.delete('keepalive') # bool
-      self.debug_dev  = opts.delete('debug_dev') # IO object such as STDOUT
-      # cf. https://github.com/nahi/httpclient/blob/0a16401e7892fbbd195a0254344bd48ac8a8bb26/lib/httpclient/session.rb#L133-L139
-      # self.connect_timeout = 60
-      # self.connect_retry = 1
-      # self.send_timeout = 120
-      # self.receive_timeout = 60        # For each read_block_size bytes
-      # self.keep_alive_timeout = 15     # '15' is from Apache 2 default
-      # self.read_block_size = 1024 * 16 # follows net/http change in 1.8.7
-      # self.protocol_retry_count = 5
+      self.debug_dev = opts['debug_dev'] # IO object such as STDOUT
+      self.open_timeout = opts['open_timeout'] || 5
+      self.read_timeout = opts['read_timeout'] || 30
+      self.keepalive    = opts['keepalive']
+      # self.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
 
-    def stringify_keys(hash)
-      {}.tap {|h| hash.each {|key, val| h[key.to_s] = val } }
+    def debug_dev=(debug_dev)
+      @debug_dev = debug_dev
+      @client.set_debug_output(debug_dev)
     end
 
-    class << self
-      def attr_proxy_reader(symbol)
-        attr_proxy(symbol)
-      end
-
-      def attr_proxy_accessor(symbol)
-        attr_proxy(symbol, true)
-      end
-
-      def attr_proxy(symbol, assignable = false)
-        name = symbol.to_s
-        define_method(name) {
-          @client.__send__(name)
-        }
-        if assignable
-          aname = name + '='
-          define_method(aname) { |rhs|
-            @client.__send__(aname, rhs)
-          }
-        end
-      end
+    def open_timeout=(open_timeout)
+      @open_time = @client.open_timeout = open_timeout
     end
 
-    # cf. https://github.com/nahi/httpclient/blob/0a16401e7892fbbd195a0254344bd48ac8a8bb26/lib/httpclient.rb#L309-L355
-    # cf. https://github.com/nahi/httpclient/blob/0a16401e7892fbbd195a0254344bd48ac8a8bb26/lib/httpclient/session.rb#L89-L158
-    # proxy::SSLConfig:: SSL configurator.
-    attr_proxy_reader :ssl_config
-    # WebAgent::CookieManager:: Cookies configurator.
-    attr_proxy_accessor :cookie_manager
-    # An array of response HTTP message body String which is used for loop-back
-    # test.  See test/* to see how to use it.  If you want to do loop-back test
-    # of HTTP header, use test_loopback_http_response instead.
-    attr_proxy_reader :test_loopback_response
-    # An array of request filter which can trap HTTP request/response.
-    # See proxy::WWWAuth to see how to use it.
-    attr_proxy_reader :request_filter
-    # proxy::ProxyAuth:: Proxy authentication handler.
-    attr_proxy_reader :proxy_auth
-    # proxy::WWWAuth:: WWW authentication handler.
-    attr_proxy_reader :www_auth
-    # How many times get_content and post_content follows HTTP redirect.
-    # 10 by default.
-    attr_proxy_accessor :follow_redirect_count
+    def read_timeout=(read_timeout)
+      @read_timeout = @client.read_timeout = read_timeout
+    end
 
-    # Set HTTP version as a String:: 'HTTP/1.0' or 'HTTP/1.1'
-    attr_proxy(:protocol_version, true)
-    # Connect timeout in sec.
-    attr_proxy(:connect_timeout, true)
-    # Request sending timeout in sec.
-    attr_proxy(:send_timeout, true)
-    # Response receiving timeout in sec.
-    attr_proxy(:receive_timeout, true)
-    # Reuse the same connection within this timeout in sec. from last used.
-    attr_proxy(:keep_alive_timeout, true)
-    # Size of reading block for non-chunked response.
-    attr_proxy(:read_block_size, true)
-    # Negotiation retry count for authentication.  5 by default.
-    attr_proxy(:protocol_retry_count, true)
-    # if your ruby is older than 2005-09-06, do not set socket_sync = false to
-    # avoid an SSL socket blocking bug in openssl/buffering.rb.
-    attr_proxy(:socket_sync, true)
-    # User-Agent header in HTTP request.
-    attr_proxy(:agent_name, true)
-    # From header in HTTP request.
-    attr_proxy(:from, true)
-    # An array of response HTTP String (not a HTTP message body) which is used
-    # for loopback test.  See test/* to see how to use it.
-    attr_proxy(:test_loopback_http_response)
-    # Decompress a compressed (with gzip or deflate) content body transparently. false by default.
-    attr_proxy(:transparent_gzip_decompression, true)
-    # Local socket address. Set HTTPClient#socket_local.host and HTTPClient#socket_local.port to specify local binding hostname and port of TCP socket.
-    attr_proxy(:socket_local, true)
-
-    # cf. https://github.com/nahi/httpclient/blob/0a16401e7892fbbd195a0254344bd48ac8a8bb26/lib/httpclient.rb#L416-L569
-    attr_proxy_accessor :debug_dev
-    attr_proxy_accessor :proxy
-    attr_proxy_accessor :no_proxy
-    def set_auth(domain, user, passwd)
-      @client.set_auth(domain, user, passwd)
+    def keepalive=(keepalive)
+      @keepalive = keepalive
     end
-    def set_basic_auth(domain, user, passwd)
-      @client.set_basic_auth(domain, user, passwd)
-    end
-    def set_proxy_auth(user, passwd)
-      @client.set_proxy_auth(user, passwd)
-    end
-    def set_cookie_store(filename)
-      @client.set_cookie_store(filename)
-    end
-    attr_proxy_reader :save_cookie_store
-    attr_proxy_reader :cookies
-    attr_proxy_accessor :redirect_uri_callback
 
     def last_request_uri
       @request_uri
@@ -142,9 +63,8 @@ module GrowthForecast
     # @return [Hash] response body
     def get_json(path)
       @request_uri = "#{@base_uri}#{path}" 
-      query = nil
       extheader = @keepalive ? { 'Connection' => 'Keep-Alive' } : {}
-      @res = client.get(@request_uri, query, extheader)
+      @res = client.get(path, extheader)
       handle_error(@res)
       JSON.parse(@res.body)
     end
@@ -154,11 +74,11 @@ module GrowthForecast
     # @param [Hash] data 
     # @return [Hash] response body
     def post_json(path, data = {})
-      pp data if @debug
       @request_uri = "#{@base_uri}#{path}" 
       json = JSON.generate(data)
       extheader = @keepalive ? { 'Connection' => 'Keep-Alive' } : {}
-      @res = client.post(@request_uri, json, extheader)
+      extheader = extheader.merge({ 'Content-Type' => 'application/json' })
+      @res = client.post(path, json, extheader)
       handle_error(@res)
       JSON.parse(@res.body)
     end
@@ -168,10 +88,11 @@ module GrowthForecast
     # @param [Hash] data 
     # @return [String] response body
     def post_query(path, data = {})
-      pp data if @debug
       @request_uri = "#{@base_uri}#{path}" 
+      form = URI.encode_www_form(data)
       extheader = @keepalive ? { 'Connection' => 'Keep-Alive' } : {}
-      @res = client.post(@request_uri, data, extheader)
+      extheader = extheader.merge({ 'Content-Type' => 'application/x-www-form-urlencoded' })
+      @res = client.post(path, form, extheader)
       handle_error(@res)
       JSON.parse(@res.body)
     end
@@ -488,11 +409,11 @@ module GrowthForecast
     end
 
     def handle_error(res)
-      case res.status
-      when 200
-      when 404
+      case res.code
+      when '200'
+      when '404'
         raise NotFound.new(error_message(res))
-      when 409
+      when '409'
         raise AlreadyExists.new(error_message(res))
       else
         raise Error.new(error_message(res))
@@ -516,6 +437,10 @@ module GrowthForecast
       # Thus, I remove the `meta` here.
       updates['meta'] = '' if !params.has_key?('meta')
       updates
+    end
+
+    def stringify_keys(hash)
+      {}.tap {|h| hash.each {|key, val| h[key.to_s] = val } }
     end
   end
 end
