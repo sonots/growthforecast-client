@@ -1,3 +1,9 @@
+# 0.80.0 (2014/02/03)
+
+Changes:
+
+  - Use `net/http` instead of `httpclient` because we met difficulties in multi-thread environments
+
 # 0.62.4 (2014/02/01)
 
 Features:

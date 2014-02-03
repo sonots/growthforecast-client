@@ -9,6 +9,7 @@ Gem::Specification.new do |gem|
   gem.homepage      = "https://github.com/sonots/growthforecast-client"
   gem.summary       = "A Ruby Client Library for GrowthForecast API"
   gem.description   = gem.summary
+  gem.licenses      = ["MIT"]
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }

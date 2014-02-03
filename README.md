@@ -46,4 +46,4 @@ $ growthforecast-client help
 
 ## Copyright
 
-Copyright (c) 2013 Naotoshi SEO. See [LICENSE](LICENSE) for details.
+Copyright (c) 2013 Naotoshi Seo. See [LICENSE](LICENSE) for details.
