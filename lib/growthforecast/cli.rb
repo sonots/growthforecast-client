@@ -8,6 +8,18 @@ class GrowthForecast::CLI < Thor
     super(args, opts, config)
   end
 
+  desc 'post <json> <api_url>', 'post a paramter to graph api'
+  long_desc <<-LONGDESC
+    Post a parameter to graph api
+
+    ex) growthforecast-client post '{"number":0}' http://{hostname}:{port}/api/{service_name}/{section_name}/{graph_name}
+  LONGDESC
+  def post(json, url)
+    base_uri, service_name, section_name, graph_name = split_url(url)
+    @client = client(base_uri)
+    puts @client.post_graph(service_name, section_name, graph_name, JSON.parse(json))
+  end
+
   desc 'delete <url>', 'delete a graph or graphs under a url'
   long_desc <<-LONGDESC
     Delete a graph or graphs under a <url> where <url> is the one obtained from the GrowthForecast URI, e.g., 
@@ -32,7 +44,7 @@ class GrowthForecast::CLI < Thor
     delete_complexes(complexes, graph_names, section_names)
   end
 
-  desc 'color <url>', 'change the color of graphs'
+  desc 'color <url>', 'change the color of graphs under url'
   long_desc <<-LONGDESC
     Change the color of graphs
 
@@ -49,7 +61,7 @@ class GrowthForecast::CLI < Thor
     setup_colors(colors, graphs)
   end
 
-  desc 'create_complex <url>', 'create complex graphs'
+  desc 'create_complex <url>', 'create complex graphs under url'
   long_desc <<-LONGDESC
     Create complex graphs under a url
 
@@ -134,7 +146,7 @@ class GrowthForecast::CLI < Thor
     end
 
     def split_path(path)
-      path = path.gsub(/.*list\/?/, '').gsub(/.*view_graph\/?/, '')
+      path = path.gsub(/.*list\/?/, '').gsub(/.*view_graph\/?/, '').gsub(/.*api\/?/, '')
       path.split('/').map {|p| CGI.unescape(p.gsub('%20', '+')) }
     end
   end
