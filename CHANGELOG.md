@@ -1,3 +1,9 @@
+# 0.80.1 (2014/02/11)
+
+Fixes:
+
+  - Fixed `net/http` errors
+
 # 0.80.0 (2014/02/03)
 
 Changes:
