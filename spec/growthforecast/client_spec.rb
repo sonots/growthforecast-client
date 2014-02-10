@@ -153,10 +153,6 @@ describe GrowthForecast::Client do
 
   describe 'http://blog.64p.org/?page=1366971426' do
     before { @client ||= client }
-    context "#client=" do
-      before { @client.client = HTTPClient.new(agent_name: 'TestAgent/0.1') }
-      it { @client.client.agent_name.should == 'TestAgent/0.1' }
-    end
 
     context "#last_response" do
       include_context "stub_list_graph" if ENV['MOCK'] == 'on'
