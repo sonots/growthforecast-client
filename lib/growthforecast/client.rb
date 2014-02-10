@@ -10,44 +10,57 @@ module GrowthForecast
   class AlreadyExists < Error; end
 
   class Client
-    attr_accessor :client
     attr_reader   :base_uri
-    attr_reader   :debug_dev
-    attr_reader   :open_timeout
-    attr_reader   :read_timeout
-    attr_reader   :keepalive
+    attr_reader   :host
+    attr_reader   :port
+    attr_accessor :debug_dev
+    attr_accessor :open_timeout
+    attr_accessor :read_timeout
+    attr_accessor :verify_ssl
+    attr_accessor :keepalive
 
     # @param [String] base_uri The base uri of GrowthForecast
     def initialize(base_uri = 'http://127.0.0.1:5125', opts = {})
       @base_uri = base_uri
-      URI.parse(base_uri).tap {|uri|
-        @client = Net::HTTP.new(uri.host, uri.port)
-        @client.use_ssl = uri.scheme == 'https'
-      }
-
       opts = stringify_keys(opts)
-      self.debug_dev = opts['debug_dev'] # IO object such as STDOUT
-      self.open_timeout = opts['open_timeout'] || 5
-      self.read_timeout = opts['read_timeout'] || 30
-      self.keepalive    = opts['keepalive']
-      # self.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+      URI.parse(base_uri).tap {|uri|
+        @host = uri.host
+        @port = uri.port
+        @use_ssl   = uri.scheme == 'https'
+      }
+      @debug_dev    = opts['debug_dev'] # IO object such as STDOUT
+      @open_timeout = opts['open_timeout'] # 60
+      @read_timeout = opts['read_timeout'] # 60
+      @verify_ssl   = opts['verify_ssl']
+      @keepalive    = opts['keepalive']
     end
 
-    def debug_dev=(debug_dev)
-      @debug_dev = debug_dev
-      @client.set_debug_output(debug_dev)
+    def http_connection
+      Net::HTTP.new(@host, @port).tap {|http|
+        http.use_ssl      = @use_ssl
+        http.open_timeout = @open_timeout if @open_timeout
+        http.read_timeout = @read_timeout if @read_timeout
+        http.verify_mode  = OpenSSL::SSL::VERIFY_NONE unless @verify_ssl
+        http.set_debug_output(@debug_dev) if @debug_dev
+      }
     end
 
-    def open_timeout=(open_timeout)
-      @open_time = @client.open_timeout = open_timeout
+    def get_request(path, extheader = {})
+      Net::HTTP::Get.new(path).tap {|req|
+        req['Host'] = @host
+        req['Connection'] = 'Keep-Alive' if @keepalive
+        extheader.each {|key, value| req[key] = value }
+      }
     end
 
-    def read_timeout=(read_timeout)
-      @read_timeout = @client.read_timeout = read_timeout
-    end
-
-    def keepalive=(keepalive)
-      @keepalive = keepalive
+    def post_request(path, body, extheader = {})
+      Net::HTTP::Post.new(path).tap {|req|
+        req['Host'] = @host
+        req['Connection'] = 'Keep-Alive' if @keepalive
+        extheader.each {|key, value| req[key] = value }
+        req.body = body
+      }
     end
 
     def last_request_uri
@@ -63,8 +76,8 @@ module GrowthForecast
     # @return [Hash] response body
     def get_json(path)
       @request_uri = "#{@base_uri}#{path}" 
-      extheader = @keepalive ? { 'Connection' => 'Keep-Alive' } : {}
-      @res = client.get(path, extheader)
+      req  = get_request(path)
+      @res = http_connection.start {|http| http.request(req) }
       handle_error(@res)
       JSON.parse(@res.body)
     end
@@ -75,10 +88,10 @@ module GrowthForecast
     # @return [Hash] response body
     def post_json(path, data = {})
       @request_uri = "#{@base_uri}#{path}" 
-      json = JSON.generate(data)
-      extheader = @keepalive ? { 'Connection' => 'Keep-Alive' } : {}
-      extheader = extheader.merge({ 'Content-Type' => 'application/json' })
-      @res = client.post(path, json, extheader)
+      body = JSON.generate(data)
+      extheader = { 'Content-Type' => 'application/json' }
+      req  = post_request(path, body, extheader)
+      @res = http_connection.start {|http| http.request(req) }
       handle_error(@res)
       JSON.parse(@res.body)
     end
@@ -89,10 +102,10 @@ module GrowthForecast
     # @return [String] response body
     def post_query(path, data = {})
       @request_uri = "#{@base_uri}#{path}" 
-      form = URI.encode_www_form(data)
-      extheader = @keepalive ? { 'Connection' => 'Keep-Alive' } : {}
-      extheader = extheader.merge({ 'Content-Type' => 'application/x-www-form-urlencoded' })
-      @res = client.post(path, form, extheader)
+      body = URI.encode_www_form(data)
+      extheader = { 'Content-Type' => 'application/x-www-form-urlencoded' }
+      req  = post_request(path, body, extheader)
+      @res = http_connection.start {|http| http.request(req) }
       handle_error(@res)
       JSON.parse(@res.body)
     end
