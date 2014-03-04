@@ -36,6 +36,17 @@ See help for more:
 $ growthforecast-client help
 ```
 
+### Tips
+
+#### Debug Print
+
+Following codes prints the http requests and responses to STDOUT
+
+```
+client = GrowthForecast::Client.new('http://localhost:5125')
+client.debug_dev = STDOUT # IO object
+```
+
 ## Contributing
 
 1. Fork it
