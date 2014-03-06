@@ -78,7 +78,7 @@ module GrowthForecast
       @request_uri = "#{@base_uri}#{path}" 
       req  = get_request(path)
       @res = http_connection.start {|http| http.request(req) }
-      handle_error(@res)
+      handle_error(@res, @request_uri)
       JSON.parse(@res.body)
     end
 
@@ -92,7 +92,7 @@ module GrowthForecast
       extheader = { 'Content-Type' => 'application/json' }
       req  = post_request(path, body, extheader)
       @res = http_connection.start {|http| http.request(req) }
-      handle_error(@res)
+      handle_error(@res, @request_uri)
       JSON.parse(@res.body)
     end
 
@@ -106,7 +106,7 @@ module GrowthForecast
       extheader = { 'Content-Type' => 'application/x-www-form-urlencoded' }
       req  = post_request(path, body, extheader)
       @res = http_connection.start {|http| http.request(req) }
-      handle_error(@res)
+      handle_error(@res, @request_uri)
       JSON.parse(@res.body)
     end
 
@@ -421,20 +421,20 @@ module GrowthForecast
       CGI.escape(str).gsub('+', '%20') if str
     end
 
-    def handle_error(res)
+    def handle_error(res, request_uri)
       case res.code
       when '200'
       when '404'
-        raise NotFound.new(error_message(res))
+        raise NotFound.new(error_message(res, request_uri))
       when '409'
-        raise AlreadyExists.new(error_message(res))
+        raise AlreadyExists.new(error_message(res, request_uri))
       else
-        raise Error.new(error_message(res))
+        raise Error.new(error_message(res, request_uri))
       end
     end
 
-    def error_message(res)
-      "status:#{res.status}\turi:#{res.http_header.request_uri.to_s}\tmessage:#{res.body}"
+    def error_message(res, request_uri)
+      "status:#{res.code}\turi:#{request_uri}\tmessage:#{res.body}"
     end
 
     # GrowthForecast's /json/edit/graph API requires all parameters to update, thus

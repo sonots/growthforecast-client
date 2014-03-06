@@ -31,10 +31,18 @@ describe GrowthForecast::Client do
   end
 
   context "#get_graph" do
-    include_context "stub_get_graph" if ENV['MOCK'] == 'on'
-    subject { client.get_graph(graph["service_name"], graph["section_name"], graph["graph_name"]) }
-    id_keys.each {|key| it { subject[key].should == graph[key] } }
-    graph_keys.each {|key| it { subject.should have_key(key) } }
+    context "200 OK" do
+      include_context "stub_get_graph" if ENV['MOCK'] == 'on'
+      subject { client.get_graph(graph["service_name"], graph["section_name"], graph["graph_name"]) }
+      id_keys.each {|key| it { subject[key].should == graph[key] } }
+      graph_keys.each {|key| it { subject.should have_key(key) } }
+    end
+
+    context "404 Not Found" do
+      include_context "stub_get_notfound_graph" if ENV['MOCK'] == 'on'
+      subject { client.get_graph(notfound_graph["service_name"], notfound_graph["section_name"], notfound_graph["graph_name"]) }
+      it { expect { subject }.to raise_error(GrowthForecast::NotFound) }
+    end
   end
 
   context "#get_graph_by_id" do
