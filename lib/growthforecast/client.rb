@@ -415,6 +415,61 @@ module GrowthForecast
       post_query("/delete_complex/#{complex_id}")
     end
 
+    # Post parameters to a vrule, POST /vrule/api/:service_name/:section_name/:graph_name
+    # @param [String] service_name
+    # @param [String] section_name
+    # @param [String] graph_name
+    # @param [Hash] params The POST parameters. See #get_vrule
+    # @return [Hash] the error code and graph property
+    # @example
+    #{"error"=>0,
+    #"data"=>{
+    #  "graph_path"=>"/hoge/hoge/hoge",
+    #  "color"=>"#FF0000",
+    #  "time"=>1395826210,
+    #  "id"=>1,
+    #  "dashes"=>"2,10",
+    #  "description"=>""}}
+    def post_vrule(params = {}, service_name = nil, section_name = nil, graph_name = nil)
+      path = "/vrule/api"
+      path += "/#{e service_name}" if service_name
+      path += "/#{e section_name}" if section_name
+      path += "/#{e graph_name}"   if graph_name
+      post_query(path, params)
+    end
+
+    # Get the data of vrules, GET /vrule/summary/:service_name/:section_name/:graph_name
+    # @param [String] service_name
+    # @param [String] section_name
+    # @param [String] graph_name
+    # @return [Hash] the data of vrules
+    # @example
+    #[
+    #{
+    #  "graph_path"=>"/hoge/hoge/hoge",
+    #  "color"=>"#FF0000",
+    #  "time"=>1395826210,
+    #  "id"=>1,
+    #  "dashes"=>"",
+    #  "description"=>""
+    #},
+    #{
+    #  "graph_path"=>"/hoge/hoge/hoge",
+    #  "color"=>"#FF0000",
+    #  "time"=>1395826363,
+    #  "id"=>2,
+    #  "dashes"=>"2,10",
+    #  "description"=>""
+    #}
+    #]
+    def get_vrule(service_name = nil, section_name = nil, graph_name = nil)
+      path = "/vrule/summary"
+      path += "/#{e service_name}" if service_name
+      path += "/#{e section_name}" if section_name
+      path += "/#{e graph_name}"   if graph_name
+      get_json(path)
+    end
+
     private
 
     def e(str)

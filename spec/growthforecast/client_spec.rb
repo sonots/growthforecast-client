@@ -7,6 +7,7 @@ describe GrowthForecast::Client do
                   sulimit unit sort updated_at adjust type sllimit meta md5]
   complex_keys = %w[number complex created_at service_name section_name id graph_name data sumup
                     description sort updated_at]
+  vrule_keys = %w[graph_path color time id dashes description]
 
   context "#list_graph" do
     include_context "stub_list_graph" if ENV['MOCK'] == 'on'
@@ -174,6 +175,30 @@ describe GrowthForecast::Client do
       before { @client.list_graph }
       subject { @client.last_request_uri }
       it { should == "http://localhost:5125/json/list/graph" }
+    end
+  end
+
+  context "#post_vrule" do
+    include_context "stub_post_vrule" if ENV['MOCK'] == 'on'
+    params = {
+      'dashes' => '2,10'
+    }
+    subject { client.post_vrule(params, graph["service_name"], graph["section_name"], graph["graph_name"]) }
+    it { subject["error"].should == 0 }
+    params.keys.each {|key| it { subject["data"][key].should == params[key] } }
+  end
+
+  context "#get_vrule" do
+    context "200 OK" do
+      include_context "stub_get_vrule" if ENV['MOCK'] == 'on'
+      subject { client.get_vrule(graph["service_name"], graph["section_name"], graph["graph_name"]).first }
+      vrule_keys.each {|key| it { subject.should have_key(key) } }
+    end
+
+    context "Not Found" do
+      include_context "stub_get_notfound_vrule" if ENV['MOCK'] == 'on'
+      subject { client.get_vrule(notfound_graph["service_name"], notfound_graph["section_name"], notfound_graph["graph_name"]) }
+      it { should == [] } # differ with 404 Not Found
     end
   end
 end

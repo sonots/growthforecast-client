@@ -225,17 +225,53 @@ shared_context "stub_create_complex" do
   before(:each, &proc)
 end
 
+def notfound_graph
+  {
+    'service_name' => 'not found',
+    'section_name' => 'not found',
+    'graph_name'   => 'not found',
+  }
+end
 shared_context "stub_get_notfound_graph" do
-  def notfound_graph
-    {
-      'service_name' => 'not found',
-      'section_name' => 'not found',
-      'graph_name'   => 'not found',
-    }
-  end
   proc = Proc.new do
     stub_request(:get, "#{base_uri}/api/#{e notfound_graph['service_name']}/#{e notfound_graph['section_name']}/#{e notfound_graph['graph_name']}").
     to_return(:status => 404, :body => '<html><body><strong>404</strong> Not Found</body></html>')
   end
   before(:each, &proc)
 end
+
+shared_context "stub_post_vrule" do
+  include_context "stub_get_vrule"
+  before do
+    stub_request(:post, "#{base_uri}/vrule/api/#{e graph['service_name']}/#{e graph['section_name']}/#{e graph['graph_name']}").
+    to_return(:status => 200, :body => { "error" => 0, "data" => vrule_example }.to_json)
+  end
+end
+
+shared_context "stub_get_vrule" do
+  def vrule_example
+    {
+      "graph_path"=>"/#{graph['service_name']}/#{graph['section_name']}/#{graph['graph_name']}",
+      "color"=>"#FF0000",
+      "time"=>1395826210,
+      "id"=>1,
+      "dashes"=>"2,10",
+      "description"=>""
+    }
+  end
+
+  proc = Proc.new do
+    stub_request(:get, "#{base_uri}/vrule/summary/#{e graph['service_name']}/#{e graph['section_name']}/#{e graph['graph_name']}").
+    to_return(:status => 200, :body => [vrule_example].to_json)
+  end
+  before(:each, &proc)
+end
+
+shared_context "stub_get_notfound_vrule" do
+  proc = Proc.new do
+    stub_request(:get, "#{base_uri}/vrule/summary/#{e notfound_graph['service_name']}/#{e notfound_graph['section_name']}/#{e notfound_graph['graph_name']}").
+    to_return(:status => 200, :body => [].to_json)
+  end
+  before(:each, &proc)
+end
+
