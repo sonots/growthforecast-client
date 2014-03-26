@@ -78,6 +78,18 @@ class GrowthForecast::CLI < Thor
     setup_complex(from_graphs, to_complex, graphs)
   end
 
+  desc 'vrule <json> <api_url>', 'create a vertical line'
+  long_desc <<-LONGDESC
+    Create a vertical line
+
+    ex) growthforecast-client vrule '{"dashes":"2,10"}' http://{hostname}:{port}/vrule/api[/{service_name}[/{section_name}[/{graph_name}]]]
+  LONGDESC
+  def vrule(json, url)
+    base_uri, service_name, section_name, graph_name = split_url(url)
+    @client = client(base_uri)
+    puts @client.post_vrule(service_name, section_name, graph_name, JSON.parse(json))
+  end
+
   no_tasks do
     def delete_graphs(graphs, graph_names = nil, section_names = nil)
       graphs.each do |graph|
