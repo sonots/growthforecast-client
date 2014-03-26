@@ -1,3 +1,9 @@
+# 0.82.1 (2014/03/26)
+
+Changes:
+
+  - Changed the argument order of #post_vrule
+
 # 0.82.0 (2014/03/26)
 
 Enhancement:
