@@ -1,3 +1,9 @@
+# 0.82.2 (2014/03/26)
+
+Enhancement:
+
+  - Add `vrule` command
+
 # 0.82.1 (2014/03/26)
 
 Changes:
