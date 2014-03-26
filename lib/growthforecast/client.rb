@@ -430,7 +430,7 @@ module GrowthForecast
     #  "id"=>1,
     #  "dashes"=>"2,10",
     #  "description"=>""}}
-    def post_vrule(params = {}, service_name = nil, section_name = nil, graph_name = nil)
+    def post_vrule(service_name = nil, section_name = nil, graph_name = nil, params = {})
       path = "/vrule/api"
       path += "/#{e service_name}" if service_name
       path += "/#{e section_name}" if section_name

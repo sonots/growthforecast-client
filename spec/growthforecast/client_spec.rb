@@ -183,7 +183,7 @@ describe GrowthForecast::Client do
     params = {
       'dashes' => '2,10'
     }
-    subject { client.post_vrule(params, graph["service_name"], graph["section_name"], graph["graph_name"]) }
+    subject { client.post_vrule(graph["service_name"], graph["section_name"], graph["graph_name"], params) }
     it { subject["error"].should == 0 }
     params.keys.each {|key| it { subject["data"][key].should == params[key] } }
   end
