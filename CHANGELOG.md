@@ -1,3 +1,9 @@
+# 0.82.0 (2014/03/26)
+
+Enhancement:
+
+  - Support newly created `vrule` api
+
 # 0.80.2 (2014/03/06)
 
 Fixes:
