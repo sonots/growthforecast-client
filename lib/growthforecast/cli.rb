@@ -112,7 +112,7 @@ class GrowthForecast::CLI < Thor
     start = Time.now
     Parallel.each_with_index(paths, :in_processes => concurrency) do |path, i|
       puts "Completed #{i} requests" if i % 1000 == 0 and i > 0
-      @client.post_graph(path[0], path[1], path[2], { "number" => rand(1000) })
+      @client.post_graph(path[0], path[1], path[2], { "number" => rand(1000) }) rescue nil
     end
     puts "Completed #{requests} requests"
     duration = (Time.now - start).to_f
