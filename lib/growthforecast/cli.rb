@@ -90,6 +90,36 @@ class GrowthForecast::CLI < Thor
     puts @client.post_vrule(service_name, section_name, graph_name, JSON.parse(json))
   end
 
+  desc 'bench <api_url>', 'benchmark the GrowthForecast'
+  long_desc <<-LONGDESC
+    Benchmark the GrowthForecast.
+
+    ex) growthforecast-client bench http://{hostname}:{port} -n 100 -c 10
+  LONGDESC
+  option :requests, :type => :numeric,  :aliases => '-n', :default => 100
+  option :concurrency, :type => :numeric,  :aliases => '-c', :default => 1
+  def bench(url)
+    requests, concurrency = options[:requests], options[:concurrency]
+    require 'parallel'
+    base_uri = split_url(url).first
+    @client = client(base_uri)
+    # generate unique paths of the same number with number of requests beforehand
+    paths = []
+    requests.times do |i|
+      paths << [(i/100).to_s, (i/50).to_s, i.to_s]
+    end
+    # Take a benchmark in parallel
+    start = Time.now
+    Parallel.each_with_index(paths, :in_processes => concurrency) do |path, i|
+      puts "Completed #{i} requests" if i % 1000 == 0 and i > 0
+      @client.post_graph(path[0], path[1], path[2], { "number" => rand(1000) })
+    end
+    puts "Completed #{requests} requests"
+    duration = (Time.now - start).to_f
+    puts "Requests per second: #{requests / duration} [#/sec] (mean)"
+    puts "Time per request:    #{duration / requests * 1000} [ms] (mean)"
+  end
+
   no_tasks do
     def delete_graphs(graphs, graph_names = nil, section_names = nil)
       graphs.each do |graph|
