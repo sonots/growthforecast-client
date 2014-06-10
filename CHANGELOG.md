@@ -1,3 +1,9 @@
+# 0.82.4 (2014/06/10)
+
+Fixes:
+
+  - Rescue exception on `bench` command
+
 # 0.82.3 (2014/06/10)
 
 Enhancement:

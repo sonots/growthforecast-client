@@ -3,7 +3,7 @@
 
 Gem::Specification.new do |gem|
   gem.name          = 'growthforecast-client'
-  gem.version       = '0.82.3'
+  gem.version       = '0.82.4'
   gem.authors       = ["Naotoshi Seo"]
   gem.email         = ["sonots@gmail.com"]
   gem.homepage      = "https://github.com/sonots/growthforecast-client"
