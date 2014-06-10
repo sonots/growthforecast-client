@@ -1,3 +1,9 @@
+# 0.82.3 (2014/06/10)
+
+Enhancement:
+
+  - Add `bench` command
+
 # 0.82.2 (2014/03/26)
 
 Enhancement:
