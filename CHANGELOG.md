@@ -1,3 +1,9 @@
+# 0.82.5 (2014/06/12)
+
+Fixes:
+
+  - Fix for uninitialized constant OpenSSL (thanks @kui)
+
 # 0.82.4 (2014/06/10)
 
 Fixes:
