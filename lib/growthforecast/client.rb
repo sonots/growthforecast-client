@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 require 'net/http'
+require 'net/https'
 require 'uri'
 require 'json'
 require 'cgi'
@@ -25,15 +26,16 @@ module GrowthForecast
       opts = stringify_keys(opts)
 
       URI.parse(base_uri).tap {|uri|
-        @host = uri.host
-        @port = uri.port
-        @use_ssl   = uri.scheme == 'https'
+        @host       = uri.host
+        @port       = uri.port
+        @use_ssl    = uri.scheme == 'https'
       }
       @debug_dev    = opts['debug_dev'] # IO object such as STDOUT
       @open_timeout = opts['open_timeout'] # 60
       @read_timeout = opts['read_timeout'] # 60
-      @verify_ssl   = opts['verify_ssl']
       @keepalive    = opts['keepalive']
+      @verify_ssl   = opts['verify_ssl']
+      @ca_file      = opts['ca_file']
     end
 
     def http_connection
@@ -41,7 +43,12 @@ module GrowthForecast
         http.use_ssl      = @use_ssl
         http.open_timeout = @open_timeout if @open_timeout
         http.read_timeout = @read_timeout if @read_timeout
-        http.verify_mode  = OpenSSL::SSL::VERIFY_NONE unless @verify_ssl
+        if @verify_ssl
+          http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+          http.ca_file     = @ca_file if @ca_file
+        else
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
         http.set_debug_output(@debug_dev) if @debug_dev
       }
     end
